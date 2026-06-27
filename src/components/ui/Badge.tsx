@@ -4,10 +4,10 @@ import { cn } from "@/lib/utils/classNames";
 type BadgeTone = "neutral" | "success" | "warning" | "danger";
 
 const tones: Record<BadgeTone, string> = {
-  neutral: "bg-slate-100 text-slate-700",
-  success: "bg-budget-soft text-budget-dark",
-  warning: "bg-amber-100 text-amber-800",
-  danger: "bg-red-100 text-red-700",
+  neutral: "border border-budget-border bg-budget-surface text-budget-muted",
+  success: "border border-budget-border bg-budget-soft text-budget-neon",
+  warning: "border border-amber-500/25 bg-amber-500/12 text-amber-300",
+  danger: "border border-red-500/25 bg-red-500/12 text-red-300",
 };
 
 export function Badge({

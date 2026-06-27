@@ -73,17 +73,17 @@ export function RegisterForm() {
             />
             <span>
               Acepto los{" "}
-              <Link href="/legal/terms" className="font-semibold text-budget-dark hover:text-budget-green">
+              <Link href="/legal/terms" className="font-semibold text-budget-neon hover:text-budget-green">
                 terminos y condiciones legales
               </Link>
               .
               {errors.acceptedTerms?.message ? (
-                <span className="mt-1 block font-medium text-red-600">{errors.acceptedTerms.message}</span>
+                <span className="mt-1 block font-medium text-red-300">{errors.acceptedTerms.message}</span>
               ) : null}
             </span>
           </label>
 
-          {formError ? <p className="rounded-lg bg-red-50 p-3 text-sm font-medium text-red-700">{formError}</p> : null}
+          {formError ? <p className="rounded-lg border border-red-500/25 bg-red-500/10 p-3 text-sm font-medium text-red-300">{formError}</p> : null}
 
           <div className="grid gap-3 sm:grid-cols-2">
             <Button type="submit" disabled={isSubmitting} onClick={() => setValue("connectMercadoPago", false)}>
@@ -102,7 +102,7 @@ export function RegisterForm() {
 
           <p className="text-sm text-budget-muted">
             Ya tenes cuenta?{" "}
-            <Link href="/auth/login" className="font-semibold text-budget-dark hover:text-budget-green">
+            <Link href="/auth/login" className="font-semibold text-budget-neon hover:text-budget-green">
               Ingresar
             </Link>
           </p>

@@ -12,7 +12,7 @@ export default function SettingsPage() {
       <PageHeader
         title="Ajustes"
         description="Configuracion personal, limites, moneda, alertas, riesgo y estado de integraciones."
-        actions={<Button><Save className="h-4 w-4" />Guardar ajustes</Button>}
+        actions={<Button disabled title="Los ajustes persistidos por usuario se activan en la fase de perfiles."><Save className="h-4 w-4" />Guardar ajustes</Button>}
       />
       <div className="grid gap-5 p-5 sm:p-8 xl:grid-cols-[1fr_0.8fr]">
         <Card>

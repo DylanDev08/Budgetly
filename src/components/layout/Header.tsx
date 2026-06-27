@@ -5,7 +5,7 @@ import { MobileNav } from "@/components/layout/MobileNav";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-budget-border bg-white/95 px-4 backdrop-blur sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-budget-border bg-budget-bg/90 px-4 backdrop-blur sm:px-6 lg:px-8">
       <div className="flex items-center gap-3">
         <MobileNav />
         <div>
@@ -20,13 +20,13 @@ export function Header() {
         </Badge>
         <Link
           href="/auth/login"
-          className="hidden h-10 items-center justify-center rounded-lg border border-budget-border bg-white px-4 text-sm font-medium text-budget-text transition-colors hover:bg-slate-50 sm:inline-flex"
+          className="hidden h-10 items-center justify-center rounded-lg border border-budget-border bg-budget-card px-4 text-sm font-medium text-budget-text transition-colors hover:bg-budget-hover sm:inline-flex"
         >
           Ingresar
         </Link>
         <Link
           href="/auth/register"
-          className="inline-flex h-10 items-center justify-center rounded-lg bg-budget-green px-4 text-sm font-medium text-white shadow-sm transition-colors hover:bg-budget-dark"
+          className="inline-flex h-10 items-center justify-center rounded-lg bg-budget-green px-4 text-sm font-semibold text-budget-bg shadow-glow transition-colors hover:bg-budget-neon"
         >
           Crear cuenta
         </Link>

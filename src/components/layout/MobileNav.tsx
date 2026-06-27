@@ -23,13 +23,13 @@ export function MobileNav() {
       <AnimatePresence>
         {open ? (
           <motion.div
-            className="fixed inset-0 z-50 bg-slate-950/35"
+            className="fixed inset-0 z-50 bg-black/70"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="h-full w-[min(22rem,88vw)] overflow-y-auto bg-white shadow-soft"
+              className="h-full w-[min(22rem,88vw)] overflow-y-auto border-r border-budget-border bg-budget-surface shadow-soft"
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
@@ -37,7 +37,7 @@ export function MobileNav() {
             >
               <div className="flex h-16 items-center justify-between border-b border-budget-border px-5">
                 <Link href="/dashboard" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-budget-green font-bold text-white">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-budget-green font-bold text-budget-bg">
                     B
                   </div>
                   <span className="font-semibold text-budget-text">Budgetly</span>
@@ -57,8 +57,8 @@ export function MobileNav() {
                       href={item.href}
                       onClick={() => setOpen(false)}
                       className={cn(
-                        "flex h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium text-budget-muted",
-                        active && "bg-budget-soft text-budget-dark",
+                        "flex h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium text-budget-muted hover:bg-budget-hover hover:text-budget-text",
+                        active && "bg-budget-soft text-budget-neon",
                       )}
                     >
                       <Icon className="h-4 w-4" aria-hidden="true" />

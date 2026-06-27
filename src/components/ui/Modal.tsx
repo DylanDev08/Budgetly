@@ -19,8 +19,8 @@ export function Modal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
-      <div className={cn("w-full max-w-lg rounded-lg bg-white shadow-soft")}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+      <div className={cn("w-full max-w-lg rounded-lg border border-budget-border bg-budget-card shadow-soft")}>
         <div className="flex items-center justify-between border-b border-budget-border px-5 py-4">
           <h2 className="text-base font-semibold text-budget-text">{title}</h2>
           <Button aria-label="Cerrar" size="icon" variant="ghost" onClick={onClose}>

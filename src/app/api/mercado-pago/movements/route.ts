@@ -1,9 +1,39 @@
 import { NextResponse } from "next/server";
+import { hasDatabaseEnv } from "@/lib/env";
+import { getAuthenticatedUser } from "@/lib/auth/getAuthenticatedUser";
+import { prisma } from "@/lib/prisma";
+import { decryptSecret } from "@/lib/security/encryption";
+import { getNormalizedMercadoPagoMovements } from "@/lib/services/mercadoPago.service";
 
 export async function GET() {
+  let accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+
+  if (!accessToken && hasDatabaseEnv()) {
+    const { user } = await getAuthenticatedUser();
+
+    if (user) {
+      const account = await prisma.mercadoPagoAccount.findUnique({ where: { userId: user.id } });
+      if (account) {
+        accessToken = decryptSecret(account.accessTokenEncrypted);
+      }
+    }
+  }
+
+  if (!accessToken) {
+    return NextResponse.json(
+      {
+        movements: [],
+        status: "missing_token",
+        message: "Configura MERCADO_PAGO_ACCESS_TOKEN o conecta Mercado Pago con OAuth.",
+      },
+      { status: 409 },
+    );
+  }
+
+  const movements = await getNormalizedMercadoPagoMovements(accessToken);
+
   return NextResponse.json({
-    movements: [],
-    status: "mock_disabled",
-    message: "La sincronizacion real de Mercado Pago se implementa en fases posteriores.",
+    movements,
+    status: "ok",
   });
 }

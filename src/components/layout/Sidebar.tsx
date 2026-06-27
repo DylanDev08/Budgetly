@@ -9,9 +9,9 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden h-screen w-72 shrink-0 border-r border-budget-border bg-white lg:sticky lg:top-0 lg:flex lg:flex-col">
+    <aside className="hidden h-screen w-72 shrink-0 border-r border-budget-border bg-budget-surface lg:sticky lg:top-0 lg:flex lg:flex-col">
       <Link href="/dashboard" className="flex h-20 items-center gap-3 border-b border-budget-border px-6">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-budget-green text-base font-bold text-white">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-budget-green text-base font-bold text-budget-bg shadow-glow">
           B
         </div>
         <div>
@@ -31,8 +31,8 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-budget-muted transition-colors hover:bg-slate-50 hover:text-budget-text",
-                  active && "bg-budget-soft text-budget-dark",
+                  "flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-budget-muted transition-colors hover:bg-budget-hover hover:text-budget-text",
+                  active && "bg-budget-soft text-budget-neon",
                 )}
               >
                 <Icon className="h-4 w-4" aria-hidden="true" />
@@ -52,8 +52,8 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-budget-muted transition-colors hover:bg-slate-50 hover:text-budget-text",
-                  active && "bg-budget-soft text-budget-dark",
+                  "flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-budget-muted transition-colors hover:bg-budget-hover hover:text-budget-text",
+                  active && "bg-budget-soft text-budget-neon",
                 )}
               >
                 <Icon className="h-4 w-4" aria-hidden="true" />
@@ -67,7 +67,7 @@ export function Sidebar() {
       <footer className="border-t border-budget-border p-5 text-xs leading-5 text-budget-muted">
         <p className="font-medium text-budget-text">Budgetly</p>
         <p>Copyright 2026. Todos los derechos reservados.</p>
-        <a className="mt-2 block font-medium text-budget-dark hover:text-budget-green" href="mailto:contacto@budgetly.app">
+        <a className="mt-2 block font-medium text-budget-neon hover:text-budget-green" href="mailto:contacto@budgetly.app">
           contacto@budgetly.app
         </a>
       </footer>

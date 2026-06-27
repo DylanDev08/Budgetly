@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Profile {
+  id                 String   @id @default(uuid())
+  userId             String   @unique @map("user_id")
+  fullName           String?  @map("full_name")
+  email              String
+  currency           String   @default("ARS")
+  alertMode          String   @default("normal") @map("alert_mode")
+  riskProfile        String   @default("conservador") @map("risk_profile")
+  monthlyBudget      Decimal  @default(0) @map("monthly_budget")
+  weeklyBudget       Decimal  @default(0) @map("weekly_budget")
+  variableBudget     Decimal  @default(0) @map("variable_budget")
+  monthlySavingsGoal Decimal  @default(0) @map("monthly_savings_goal")
+  theme              String   @default("dark")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@map("profiles")
+}
+
+model Transaction {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  externalId String?  @map("external_id")
+  kind       String
+  name       String
+  amount     Decimal
+  category   String
+  type       String
+  source     String   @default("manual")
+  date       DateTime
+  note       String?
+  invoiceId  String?  @map("invoice_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  invoice Invoice? @relation("TransactionInvoice")
+
+  @@unique([userId, externalId])
+  @@index([userId, date])
+  @@index([userId, category])
+  @@map("transactions")
+}
+
+model Invoice {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  transactionId String   @unique @map("transaction_id")
+  invoiceNumber String   @unique @map("invoice_number")
+  type          String
+  date          DateTime
+  amount        Decimal
+  concept       String
+  category      String
+  source        String
+  status        String   @default("generada")
+  pdfUrl        String?  @map("pdf_url")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  transaction Transaction @relation("TransactionInvoice", fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+  @@map("invoices")
+}
+
+model Budget {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  name            String
+  category        String?
+  type            String
+  limitAmount     Decimal  @map("limit_amount")
+  alertPercentage Int      @default(80) @map("alert_percentage")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("budgets")
+}
+
+model Obligation {
+  id                    String   @id @default(uuid())
+  userId                String   @map("user_id")
+  name                  String
+  amount                Decimal
+  category              String
+  frequency             String
+  dueDay                Int      @map("due_day")
+  status                String   @default("pendiente")
+  autoCreateTransaction Boolean  @default(false) @map("auto_create_transaction")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@index([userId, dueDay])
+  @@map("obligations")
+}
+
+model Goal {
+  id             String   @id @default(uuid())
+  userId         String   @map("user_id")
+  name           String
+  targetAmount   Decimal  @map("target_amount")
+  currentAmount  Decimal  @default(0) @map("current_amount")
+  deadline       DateTime?
+  priority       String   @default("media")
+  autoEnabled    Boolean  @default(false) @map("auto_enabled")
+  autoPercentage Decimal  @default(0) @map("auto_percentage")
+  status         String   @default("activa")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  contributions GoalContribution[]
+
+  @@index([userId, status])
+  @@map("goals")
+}
+
+model GoalContribution {
+  id            String   @id @default(uuid())
+  goalId        String   @map("goal_id")
+  transactionId String?  @map("transaction_id")
+  amount        Decimal
+  source        String
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  goal Goal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@map("goal_contributions")
+}
+
+model ScheduleBlock {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  day       String
+  startTime String   @map("start_time")
+  endTime   String   @map("end_time")
+  activity  String
+  area      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId, day])
+  @@map("schedule_blocks")
+}
+
+model Routine {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  name      String
+  frequency String
+  done      Boolean  @default(false)
+  streak    Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("routines")
+}
+
+model MercadoPagoAccount {
+  id                    String   @id @default(uuid())
+  userId                String   @unique @map("user_id")
+  mpUserId              String?  @map("mp_user_id")
+  accountEmail          String?  @map("account_email")
+  accessTokenEncrypted  String   @map("access_token_encrypted")
+  refreshTokenEncrypted String   @map("refresh_token_encrypted")
+  expiresAt             DateTime @map("expires_at")
+  lastSync              DateTime? @map("last_sync")
+  syncStatus            String   @default("idle") @map("sync_status")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@map("mercado_pago_accounts")
+}
+
+model AssistantMessage {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  role      String
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@map("assistant_messages")
+}
+
+model MarketSignal {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  asset      String
+  signalType String   @map("signal_type")
+  riskLevel  String   @map("risk_level")
+  summary    String
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@map("market_signals")
+}
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}

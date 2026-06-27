@@ -10,6 +10,7 @@ import {
   ListChecks,
   Receipt,
   Settings,
+  ShieldCheck,
   Target,
   WalletCards,
 } from "lucide-react";
@@ -31,4 +32,6 @@ export const navigationItems = [
 
 export const secondaryNavigationItems = [
   { label: "Terminos legales", href: "/legal/terms", icon: Flag },
+  { label: "Privacidad", href: "/legal/privacy", icon: ShieldCheck },
+  { label: "Seguridad", href: "/legal/security", icon: ShieldCheck },
 ] as const;

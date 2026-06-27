@@ -10,7 +10,7 @@ export default function ObligationsPage() {
       icon={Receipt}
       emptyTitle="Sin obligaciones pendientes"
       emptyDescription="Cuando se marque una obligacion como pagada, la app podra crear el egreso y su comprobante interno."
-      actions={<Button><Plus className="h-4 w-4" />Nueva obligacion</Button>}
+      actions={<Button disabled title="El CRUD real de obligaciones se implementa en la fase de obligaciones."><Plus className="h-4 w-4" />Nueva obligacion</Button>}
     />
   );
 }

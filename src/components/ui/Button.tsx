@@ -12,13 +12,13 @@ export interface ButtonProps
 
 const variants: Record<ButtonVariant, string> = {
   primary:
-    "bg-budget-green text-white shadow-sm hover:bg-budget-dark focus-visible:ring-budget-green",
+    "bg-budget-green text-budget-bg shadow-glow hover:bg-budget-neon focus-visible:ring-budget-green",
   secondary:
-    "border border-budget-border bg-white text-budget-text hover:bg-slate-50 focus-visible:ring-budget-green",
+    "border border-budget-border bg-budget-card text-budget-text hover:bg-budget-hover focus-visible:ring-budget-green",
   ghost:
-    "bg-transparent text-budget-muted hover:bg-slate-100 hover:text-budget-text focus-visible:ring-budget-green",
+    "bg-transparent text-budget-muted hover:bg-budget-hover hover:text-budget-text focus-visible:ring-budget-green",
   danger:
-    "bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500",
+    "bg-red-600 text-white hover:bg-red-500 focus-visible:ring-red-500",
 };
 
 const sizes: Record<ButtonSize, string> = {
@@ -34,7 +34,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       ref={ref}
       type={type}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-60",
+        "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-budget-bg disabled:cursor-not-allowed disabled:opacity-60",
         variants[variant],
         sizes[size],
         className,

@@ -10,7 +10,7 @@ export default function SchedulePage() {
       icon={CalendarDays}
       emptyTitle="Sin bloques horarios"
       emptyDescription="La agenda semanal va a mostrar bloques por dia, hora de inicio, hora de fin y area."
-      actions={<Button><Plus className="h-4 w-4" />Nuevo bloque</Button>}
+      actions={<Button disabled title="La edicion de agenda se implementa en la fase de horarios."><Plus className="h-4 w-4" />Nuevo bloque</Button>}
     />
   );
 }

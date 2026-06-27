@@ -10,7 +10,7 @@ export default function MovementsPage() {
       icon={WalletCards}
       emptyTitle="Sin movimientos registrados"
       emptyDescription="El CRUD de movimientos se implementa en la fase de transacciones con comprobantes internos automaticos."
-      actions={<Button><Plus className="h-4 w-4" />Nuevo movimiento</Button>}
+      actions={<Button disabled title="El CRUD real de movimientos se implementa en la fase de transacciones."><Plus className="h-4 w-4" />Nuevo movimiento</Button>}
     />
   );
 }

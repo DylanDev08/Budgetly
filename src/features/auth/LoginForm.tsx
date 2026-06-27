@@ -58,13 +58,13 @@ export function LoginForm() {
             error={errors.password?.message}
             {...register("password")}
           />
-          {formError ? <p className="rounded-lg bg-red-50 p-3 text-sm font-medium text-red-700">{formError}</p> : null}
+          {formError ? <p className="rounded-lg border border-red-500/25 bg-red-500/10 p-3 text-sm font-medium text-red-300">{formError}</p> : null}
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Ingresando..." : "Ingresar"}
           </Button>
           <p className="text-sm text-budget-muted">
             No tenes cuenta?{" "}
-            <Link href="/auth/register" className="font-semibold text-budget-dark hover:text-budget-green">
+            <Link href="/auth/register" className="font-semibold text-budget-neon hover:text-budget-green">
               Crear cuenta
             </Link>
           </p>

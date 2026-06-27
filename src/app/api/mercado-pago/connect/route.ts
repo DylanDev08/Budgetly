@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getAppUrl } from "@/lib/env";
+import { getAppUrl, hasSupabaseEnv } from "@/lib/env";
+import { getAuthenticatedUser } from "@/lib/auth/getAuthenticatedUser";
 
 export async function GET(request: Request) {
   const clientId = process.env.MERCADO_PAGO_CLIENT_ID;
@@ -9,6 +10,16 @@ export async function GET(request: Request) {
     const url = new URL("/mercado-pago", getAppUrl());
     url.searchParams.set("status", "missing_config");
     return NextResponse.redirect(url);
+  }
+
+  if (hasSupabaseEnv()) {
+    const { user } = await getAuthenticatedUser();
+
+    if (!user) {
+      const loginUrl = new URL("/auth/login", getAppUrl());
+      loginUrl.searchParams.set("next", "/mercado-pago");
+      return NextResponse.redirect(loginUrl);
+    }
   }
 
   const from = new URL(request.url).searchParams.get("from") ?? "manual";

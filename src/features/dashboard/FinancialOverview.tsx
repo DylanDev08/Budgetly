@@ -43,7 +43,7 @@ export function FinancialOverview() {
           </CardHeader>
           <CardContent>
             <div className="flex items-start gap-3">
-              <div className="rounded-lg bg-amber-100 p-2 text-amber-700">
+              <div className="rounded-lg border border-amber-500/25 bg-amber-500/10 p-2 text-amber-300">
                 <AlertTriangle className="h-5 w-5" aria-hidden="true" />
               </div>
               <div>

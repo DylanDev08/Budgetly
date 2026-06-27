@@ -10,6 +10,10 @@ export function hasSupabaseEnv() {
   return Boolean(url && anonKey);
 }
 
+export function hasDatabaseEnv() {
+  return Boolean(process.env.DATABASE_URL);
+}
+
 export function getAppUrl() {
   return process.env.APP_URL ?? "http://localhost:3000";
 }
