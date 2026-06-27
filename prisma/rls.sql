@@ -16,6 +16,24 @@ create policy "transactions_owner_all" on transactions for all using (auth.uid()
 create policy "budgets_owner_all" on budgets for all using (auth.uid()::text = user_id) with check (auth.uid()::text = user_id);
 create policy "obligations_owner_all" on obligations for all using (auth.uid()::text = user_id) with check (auth.uid()::text = user_id);
 create policy "goals_owner_all" on goals for all using (auth.uid()::text = user_id) with check (auth.uid()::text = user_id);
+create policy "goal_contributions_owner_all" on goal_contributions
+for all
+using (
+  exists (
+    select 1
+    from goals
+    where goals.id = goal_contributions.goal_id
+      and goals.user_id = auth.uid()::text
+  )
+)
+with check (
+  exists (
+    select 1
+    from goals
+    where goals.id = goal_contributions.goal_id
+      and goals.user_id = auth.uid()::text
+  )
+);
 create policy "schedule_blocks_owner_all" on schedule_blocks for all using (auth.uid()::text = user_id) with check (auth.uid()::text = user_id);
 create policy "routines_owner_all" on routines for all using (auth.uid()::text = user_id) with check (auth.uid()::text = user_id);
 create policy "invoices_owner_all" on invoices for all using (auth.uid()::text = user_id) with check (auth.uid()::text = user_id);

@@ -1,16 +1,12 @@
-import { Plus, Receipt } from "lucide-react";
-import { BasePage } from "@/components/layout/BasePage";
-import { Button } from "@/components/ui/Button";
+import { Receipt } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { ObligationManager } from "@/features/obligations/ObligationManager";
 
 export default function ObligationsPage() {
   return (
-    <BasePage
-      title="Obligaciones"
-      description="Servicios, suscripciones, cuotas, deudas y pagos recurrentes."
-      icon={Receipt}
-      emptyTitle="Sin obligaciones pendientes"
-      emptyDescription="Cuando se marque una obligacion como pagada, la app podra crear el egreso y su comprobante interno."
-      actions={<Button disabled title="El CRUD real de obligaciones se implementa en la fase de obligaciones."><Plus className="h-4 w-4" />Nueva obligacion</Button>}
-    />
+    <>
+      <PageHeader title="Obligaciones" description="Servicios, suscripciones, cuotas, deudas y pagos recurrentes." icon={Receipt} />
+      <ObligationManager />
+    </>
   );
 }

@@ -3,12 +3,34 @@
 import Link from "next/link";
 import { CreditCard } from "lucide-react";
 import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 
+type MercadoPagoAccountState = {
+  connected: boolean;
+  status: string;
+  accountEmail?: string | null;
+  lastSync?: string | null;
+};
+
 export function MercadoPagoConnectionCard() {
+  const queryClient = useQueryClient();
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(false);
+  const accountQuery = useQuery<MercadoPagoAccountState>({
+    queryKey: ["/api/mercado-pago/account"],
+    queryFn: async () => {
+      const response = await fetch("/api/mercado-pago/account");
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error ?? "No se pudo validar Mercado Pago.");
+      }
+
+      return result;
+    },
+  });
 
   async function syncMovements() {
     setSyncing(true);
@@ -24,6 +46,7 @@ export function MercadoPagoConnectionCard() {
       }
 
       setSyncMessage(`Sincronizacion lista. Importados: ${result.imported ?? 0}. Omitidos: ${result.skipped ?? 0}.`);
+      await queryClient.invalidateQueries({ queryKey: ["/api/mercado-pago/account"] });
     } catch {
       setSyncMessage("No se pudo conectar con el backend de sincronizacion.");
     } finally {
@@ -36,7 +59,9 @@ export function MercadoPagoConnectionCard() {
       <CardHeader>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <CardTitle>Conexion personal de Mercado Pago</CardTitle>
-          <Badge tone="warning">No conectado</Badge>
+          <Badge tone={accountQuery.data?.connected ? "success" : "warning"}>
+            {accountQuery.data?.connected ? "Conectado" : "No conectado"}
+          </Badge>
         </div>
       </CardHeader>
       <CardContent>
@@ -49,6 +74,11 @@ export function MercadoPagoConnectionCard() {
               La conexion se inicia desde el backend para no exponer tokens. Cuando agregues credenciales reales,
               Budgetly va a redirigir al OAuth de Mercado Pago y guardar la vinculacion por usuario.
             </p>
+            <div className="grid gap-1 rounded-lg border border-budget-border bg-budget-surface p-3 text-sm text-budget-muted">
+              <p>Estado: {accountQuery.data?.status ?? "validando"}</p>
+              <p>Cuenta: {accountQuery.data?.accountEmail ?? "sin vincular"}</p>
+              <p>Ultima sync: {accountQuery.data?.lastSync ? new Date(accountQuery.data.lastSync).toLocaleString("es-AR") : "sin sincronizar"}</p>
+            </div>
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/api/mercado-pago/connect"

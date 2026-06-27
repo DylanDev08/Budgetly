@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { getAppUrl, hasSupabaseEnv } from "@/lib/env";
+import { getAppUrl, hasDatabaseEnv, hasSupabaseEnv } from "@/lib/env";
 import { getClientIp, rateLimit } from "@/lib/security/rateLimit";
+import { ensureUserProfile } from "@/lib/services/profile.service";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { registerSchema } from "@/features/auth/schemas";
 
@@ -23,9 +24,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Supabase no esta configurado." }, { status: 503 });
   }
 
+  if (!hasDatabaseEnv()) {
+    return NextResponse.json({ error: "DATABASE_URL no esta configurado." }, { status: 503 });
+  }
+
   const { email, password, fullName, connectMercadoPago } = parsed.data;
   const supabase = await createServerSupabaseClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -38,6 +43,20 @@ export async function POST(request: Request) {
 
   if (error) {
     return NextResponse.json({ error: "No se pudo crear la cuenta." }, { status: 400 });
+  }
+
+  if (!data.user) {
+    return NextResponse.json({ error: "No se pudo confirmar el usuario creado." }, { status: 400 });
+  }
+
+  try {
+    await ensureUserProfile({
+      userId: data.user.id,
+      fullName,
+      email,
+    });
+  } catch {
+    return NextResponse.json({ error: "La cuenta se creo, pero no se pudo inicializar el perfil." }, { status: 500 });
   }
 
   return NextResponse.json({

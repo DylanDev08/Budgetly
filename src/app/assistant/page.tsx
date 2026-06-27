@@ -1,14 +1,12 @@
 import { Bot } from "lucide-react";
-import { BasePage } from "@/components/layout/BasePage";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { AssistantChat } from "@/features/assistant/AssistantChat";
 
 export default function AssistantPage() {
   return (
-    <BasePage
-      title="Bot asistente"
-      description="Asistente financiero basado en reglas locales y preparado para IA futura."
-      icon={Bot}
-      emptyTitle="Asistente listo para reglas locales"
-      emptyDescription="El bot respondera usando datos reales de movimientos, presupuestos, obligaciones, metas, horarios y ajustes."
-    />
+    <>
+      <PageHeader title="Bot asistente" description="Asistente financiero local basado en tus datos reales." icon={Bot} />
+      <AssistantChat />
+    </>
   );
 }

@@ -31,6 +31,7 @@ export const navigationItems = [
 ] as const;
 
 export const secondaryNavigationItems = [
+  { label: "Admin", href: "/admin", icon: ShieldCheck },
   { label: "Terminos legales", href: "/legal/terms", icon: Flag },
   { label: "Privacidad", href: "/legal/privacy", icon: ShieldCheck },
   { label: "Seguridad", href: "/legal/security", icon: ShieldCheck },

@@ -41,7 +41,8 @@ model Transaction {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  invoice Invoice? @relation("TransactionInvoice")
+  invoice           Invoice?           @relation("TransactionInvoice")
+  goalContributions GoalContribution[]
 
   @@unique([userId, externalId])
   @@index([userId, date])
@@ -63,6 +64,7 @@ model Invoice {
   status        String   @default("generada")
   pdfUrl        String?  @map("pdf_url")
   createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   transaction Transaction @relation("TransactionInvoice", fields: [transactionId], references: [id], onDelete: Cascade)
 
@@ -130,8 +132,11 @@ model GoalContribution {
   source        String
   createdAt     DateTime @default(now()) @map("created_at")
 
-  goal Goal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  goal        Goal         @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  transaction Transaction? @relation(fields: [transactionId], references: [id], onDelete: SetNull)
 
+  @@index([goalId])
+  @@index([transactionId])
   @@map("goal_contributions")
 }
 
@@ -202,13 +207,4 @@ model MarketSignal {
 
   @@index([userId])
   @@map("market_signals")
-}
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }

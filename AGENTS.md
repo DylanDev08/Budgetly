@@ -2,7 +2,7 @@ Actuá como un Senior Full Stack Developer + Software Architect + UX/UI Designer
 
 Quiero desarrollar una app web de finanzas personales llamada provisionalmente:
 
-Finanzas Peke BG
+Budgetly
 
 La app debe estar pensada como una plataforma personal de control financiero, organización diaria, conexión con Mercado Pago, métricas, metas, bot asistente y análisis educativo de inversión.
 

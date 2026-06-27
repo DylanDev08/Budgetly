@@ -16,6 +16,8 @@ declare module "lucide-react" {
   export const Bot: LucideIcon;
   export const CalendarDays: LucideIcon;
   export const CreditCard: LucideIcon;
+  export const CheckCircle: LucideIcon;
+  export const Download: LucideIcon;
   export const FileText: LucideIcon;
   export const Flag: LucideIcon;
   export const Gauge: LucideIcon;
@@ -23,12 +25,16 @@ declare module "lucide-react" {
   export const Landmark: LucideIcon;
   export const ListChecks: LucideIcon;
   export const Menu: LucideIcon;
+  export const Pencil: LucideIcon;
   export const Plus: LucideIcon;
   export const Receipt: LucideIcon;
   export const Save: LucideIcon;
+  export const Send: LucideIcon;
   export const Settings: LucideIcon;
   export const ShieldCheck: LucideIcon;
   export const Target: LucideIcon;
+  export const Trash2: LucideIcon;
+  export const Upload: LucideIcon;
   export const Wallet: LucideIcon;
   export const WalletCards: LucideIcon;
   export const X: LucideIcon;

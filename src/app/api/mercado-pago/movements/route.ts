@@ -6,16 +6,18 @@ import { decryptSecret } from "@/lib/security/encryption";
 import { getNormalizedMercadoPagoMovements } from "@/lib/services/mercadoPago.service";
 
 export async function GET() {
+  const { user, error } = await getAuthenticatedUser();
+
+  if (!user) {
+    return NextResponse.json({ error }, { status: 401 });
+  }
+
   let accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
 
   if (!accessToken && hasDatabaseEnv()) {
-    const { user } = await getAuthenticatedUser();
-
-    if (user) {
-      const account = await prisma.mercadoPagoAccount.findUnique({ where: { userId: user.id } });
-      if (account) {
-        accessToken = decryptSecret(account.accessTokenEncrypted);
-      }
+    const account = await prisma.mercadoPagoAccount.findUnique({ where: { userId: user.id } });
+    if (account) {
+      accessToken = decryptSecret(account.accessTokenEncrypted);
     }
   }
 

@@ -4,6 +4,7 @@ import type { Database } from "@/types/database";
 
 const publicPrefixes = ["/auth", "/legal", "/api", "/_next"];
 const publicPaths = ["/"];
+const maxSessionAgeMs = 24 * 60 * 60 * 1000;
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({
@@ -41,6 +42,14 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
     url.searchParams.set("next", pathname);
+    return NextResponse.redirect(url);
+  }
+
+  if (user?.last_sign_in_at && Date.now() - new Date(user.last_sign_in_at).getTime() > maxSessionAgeMs) {
+    await supabase.auth.signOut();
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/login";
+    url.searchParams.set("reason", "session_expired");
     return NextResponse.redirect(url);
   }
 

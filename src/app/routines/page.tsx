@@ -1,16 +1,12 @@
-import { ListChecks, Plus } from "lucide-react";
-import { BasePage } from "@/components/layout/BasePage";
-import { Button } from "@/components/ui/Button";
+import { ListChecks } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { RoutineManager } from "@/features/routines/RoutineManager";
 
 export default function RoutinesPage() {
   return (
-    <BasePage
-      title="Rutinas"
-      description="Seguimiento de habitos, frecuencia, cumplimiento y rachas."
-      icon={ListChecks}
-      emptyTitle="Sin rutinas cargadas"
-      emptyDescription="Las rutinas se van a administrar con checks, frecuencia y estadisticas de cumplimiento."
-      actions={<Button disabled title="El CRUD real de rutinas se implementa en la fase de organizacion."><Plus className="h-4 w-4" />Nueva rutina</Button>}
-    />
+    <>
+      <PageHeader title="Rutinas" description="Seguimiento de habitos, frecuencia, cumplimiento y rachas." icon={ListChecks} />
+      <RoutineManager />
+    </>
   );
 }

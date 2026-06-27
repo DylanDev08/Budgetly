@@ -1,14 +1,12 @@
 import { FileText } from "lucide-react";
-import { BasePage } from "@/components/layout/BasePage";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { InvoiceList } from "@/features/invoices/InvoiceList";
 
 export default function InvoicesPage() {
   return (
-    <BasePage
-      title="Comprobantes"
-      description="Comprobantes internos asociados a ingresos, egresos y sincronizaciones."
-      icon={FileText}
-      emptyTitle="Sin comprobantes generados"
-      emptyDescription="Cada movimiento manual o importado generara un comprobante interno, no una factura legal AFIP."
-    />
+    <>
+      <PageHeader title="Comprobantes" description="Comprobantes internos asociados a ingresos, egresos y sincronizaciones." icon={FileText} />
+      <InvoiceList />
+    </>
   );
 }
