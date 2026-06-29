@@ -7,8 +7,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { BudgetlyLogo } from "@/components/brand/BudgetlyLogo";
 import { cn } from "@/lib/utils/classNames";
-import { adminNavigationItem, navigationItems, secondaryNavigationItems } from "@/components/layout/navigation";
+import { adminNavigationItem, navigationGroups, secondaryNavigationItems } from "@/components/layout/navigation";
 
 type SettingsResponse = {
   item?: {
@@ -33,7 +34,6 @@ export function MobileNav() {
   });
   const secondaryItems =
     profileQuery.data?.item?.role === "admin" ? [adminNavigationItem, ...secondaryNavigationItems] : secondaryNavigationItems;
-  const items = [...navigationItems, ...secondaryItems];
 
   return (
     <div className="lg:hidden">
@@ -58,35 +58,64 @@ export function MobileNav() {
             >
               <div className="flex h-16 items-center justify-between border-b border-budget-border px-5">
                 <Link href="/dashboard" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-budget-green font-bold text-budget-bg">
-                    B
-                  </div>
+                  <BudgetlyLogo compact />
                   <span className="font-semibold text-budget-text">Budgetly</span>
                 </Link>
                 <Button aria-label="Cerrar navegacion" size="icon" variant="ghost" onClick={() => setOpen(false)}>
                   <X className="h-5 w-5" />
                 </Button>
               </div>
-              <nav className="grid gap-1 p-4">
-                {items.map((item) => {
-                  const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-                  const Icon = item.icon;
+              <nav className="grid gap-5 p-4">
+                {navigationGroups.map((group) => (
+                  <section key={group.label} className="grid gap-2">
+                    <p className="px-3 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-budget-dim">{group.label}</p>
+                    <div className="grid gap-1">
+                      {group.items.map((item) => {
+                        const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+                        const Icon = item.icon;
 
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setOpen(false)}
-                      className={cn(
-                        "flex h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium text-budget-muted hover:bg-budget-hover hover:text-budget-text",
-                        active && "bg-budget-soft text-budget-neon",
-                      )}
-                    >
-                      <Icon className="h-4 w-4" aria-hidden="true" />
-                      {item.label}
-                    </Link>
-                  );
-                })}
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setOpen(false)}
+                            className={cn(
+                              "flex h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium text-budget-muted hover:bg-budget-hover hover:text-budget-text",
+                              active && "bg-budget-soft text-budget-neon",
+                            )}
+                          >
+                            <Icon className="h-4 w-4" aria-hidden="true" />
+                            {item.label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </section>
+                ))}
+                <section className="grid gap-2 border-t border-budget-border pt-4">
+                  <p className="px-3 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-budget-dim">Sistema</p>
+                  <div className="grid gap-1">
+                    {secondaryItems.map((item) => {
+                      const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+                      const Icon = item.icon;
+
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setOpen(false)}
+                          className={cn(
+                            "flex h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium text-budget-muted hover:bg-budget-hover hover:text-budget-text",
+                            active && "bg-budget-soft text-budget-neon",
+                          )}
+                        >
+                          <Icon className="h-4 w-4" aria-hidden="true" />
+                          {item.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </section>
               </nav>
             </motion.div>
           </motion.div>

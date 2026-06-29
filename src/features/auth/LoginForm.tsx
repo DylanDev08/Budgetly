@@ -29,9 +29,12 @@ export function LoginForm({ error }: { error?: string }) {
   }
 
   return (
-    <Card className="mx-auto w-full max-w-md">
+    <Card className="w-full border-budget-border/80 bg-budget-card/95">
       <CardHeader>
-        <CardTitle>Ingresar a Budgetly</CardTitle>
+        <CardTitle>Acceso personal</CardTitle>
+        <p className="mt-2 text-sm leading-6 text-budget-muted">
+          El perfil se crea automaticamente al validar Google y queda asociado a tu rol, plan y configuracion.
+        </p>
       </CardHeader>
       <CardContent className="grid gap-4">
         {error ? (
@@ -39,12 +42,12 @@ export function LoginForm({ error }: { error?: string }) {
             {oauthErrors[error] ?? "No se pudo iniciar sesion."}
           </p>
         ) : null}
-        <Button type="button" onClick={signInWithGoogle}>
+        <Button type="button" size="lg" className="w-full" onClick={signInWithGoogle}>
           <ShieldCheck className="h-4 w-4" />
           Entrar con Google
         </Button>
-        <p className="text-sm leading-6 text-budget-muted">
-          Budgetly usa Supabase Auth con Google OAuth. No guardamos claves propias en la app.
+        <p className="rounded-lg border border-budget-border bg-budget-surface p-3 text-sm leading-6 text-budget-muted">
+          Budgetly usa Supabase Auth. No guardamos claves propias ni mostramos contrasenas en el panel admin.
         </p>
       </CardContent>
     </Card>

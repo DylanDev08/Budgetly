@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { buildCategoryPath, getCategoriesForKind, splitCategoryPath } from "@/lib/domain/categories";
 
 type Movement = {
   id: string;
@@ -28,6 +29,7 @@ type MovementForm = {
   name: string;
   amount: string;
   category: string;
+  subcategory: string;
   type: string;
   source: "manual" | "mercado_pago";
   date: string;
@@ -39,7 +41,8 @@ const initialValues: MovementForm = {
   kind: "expense",
   name: "",
   amount: "",
-  category: "",
+  category: "Comida",
+  subcategory: "Supermercado",
   type: "variable",
   source: "manual",
   date: new Date().toISOString().slice(0, 10),
@@ -60,6 +63,8 @@ async function apiJson<T>(input: RequestInfo, init?: RequestInit): Promise<T> {
 function toPayload(values: MovementForm) {
   return {
     ...values,
+    category: buildCategoryPath(values.category, values.subcategory),
+    subcategory: undefined,
     externalId: values.externalId || null,
     amount: Number(values.amount),
     note: values.note || null,
@@ -162,19 +167,26 @@ export function MovementManager() {
   }
 
   function edit(item: Movement) {
+    const categoryPath = splitCategoryPath(item.category);
+
     setEditingId(item.id);
     setValues({
       externalId: item.externalId ?? "",
       kind: item.kind,
       name: item.name,
       amount: String(item.amount),
-      category: item.category,
+      category: categoryPath.category,
+      subcategory: categoryPath.subcategory,
       type: item.type,
       source: item.source as "manual" | "mercado_pago",
       date: item.date,
       note: item.note ?? "",
     });
   }
+
+  const categoryOptions = getCategoriesForKind(values.kind);
+  const selectedCategory = categoryOptions.find((category) => category.value === values.category) ?? categoryOptions[0];
+  const subcategoryOptions = selectedCategory?.subcategories ?? [];
 
   async function importFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -196,13 +208,55 @@ export function MovementManager() {
         </CardHeader>
         <CardContent>
           <form className="grid gap-4" onSubmit={submit}>
-            <Select label="Tipo de movimiento" value={values.kind} onChange={(event) => setValues((current) => ({ ...current, kind: event.target.value as MovementForm["kind"] }))}>
+            <Select
+              label="Tipo de movimiento"
+              value={values.kind}
+              onChange={(event) => {
+                const kind = event.target.value as MovementForm["kind"];
+                const nextCategory = getCategoriesForKind(kind)[0];
+
+                setValues((current) => ({
+                  ...current,
+                  kind,
+                  category: nextCategory?.value ?? "",
+                  subcategory: nextCategory?.subcategories[0] ?? "",
+                }));
+              }}
+            >
               <option value="expense">Gasto</option>
               <option value="income">Ingreso</option>
             </Select>
             <Input label="Nombre" value={values.name} onChange={(event) => setValues((current) => ({ ...current, name: event.target.value }))} required />
             <Input label="Monto" type="number" min="0" step="0.01" value={values.amount} onChange={(event) => setValues((current) => ({ ...current, amount: event.target.value }))} required />
-            <Input label="Categoria" value={values.category} onChange={(event) => setValues((current) => ({ ...current, category: event.target.value }))} required />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Select
+                label="Categoria"
+                value={values.category}
+                onChange={(event) => {
+                  const category = categoryOptions.find((item) => item.value === event.target.value);
+
+                  setValues((current) => ({
+                    ...current,
+                    category: event.target.value,
+                    subcategory: category?.subcategories[0] ?? "",
+                  }));
+                }}
+                required
+              >
+                {categoryOptions.map((category) => (
+                  <option key={category.value} value={category.value}>
+                    {category.label}
+                  </option>
+                ))}
+              </Select>
+              <Select label="Subcategoria" value={values.subcategory} onChange={(event) => setValues((current) => ({ ...current, subcategory: event.target.value }))}>
+                {subcategoryOptions.map((subcategory) => (
+                  <option key={subcategory} value={subcategory}>
+                    {subcategory}
+                  </option>
+                ))}
+              </Select>
+            </div>
             <Select label="Frecuencia" value={values.type} onChange={(event) => setValues((current) => ({ ...current, type: event.target.value }))}>
               <option value="fijo">Fijo</option>
               <option value="mensual">Mensual</option>

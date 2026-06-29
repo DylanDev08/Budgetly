@@ -8,7 +8,7 @@ export default async function AdminPage() {
 
   return (
     <>
-      <PageHeader title="Admin" description="Panel local para perfiles registrados en Budgetly." icon={ShieldCheck} />
+      <PageHeader title="Admin" description="Control de usuarios, perfiles locales, planes y logins externos." icon={ShieldCheck} />
       <AdminProfilesPanel />
     </>
   );

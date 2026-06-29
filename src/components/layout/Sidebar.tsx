@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { BudgetlyLogo } from "@/components/brand/BudgetlyLogo";
 import { cn } from "@/lib/utils/classNames";
-import { adminNavigationItem, navigationItems, secondaryNavigationItems } from "@/components/layout/navigation";
+import { adminNavigationItem, navigationGroups, secondaryNavigationItems } from "@/components/layout/navigation";
 
 type SettingsResponse = {
   item?: {
@@ -38,25 +38,35 @@ export function Sidebar() {
       </Link>
 
       <nav className="flex-1 overflow-y-auto px-4 py-5">
-        <div className="grid gap-1">
-          {navigationItems.map((item) => {
-            const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-            const Icon = item.icon;
+        <div className="grid gap-5">
+          {navigationGroups.map((group) => (
+            <section key={group.label} className="grid gap-2">
+              <div className="px-3">
+                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-budget-dim">{group.label}</p>
+                <p className="mt-1 text-xs text-budget-muted">{group.description}</p>
+              </div>
+              <div className="grid gap-1">
+                {group.items.map((item) => {
+                  const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+                  const Icon = item.icon;
 
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-budget-muted transition-colors hover:bg-budget-hover hover:text-budget-text",
-                  active && "bg-budget-soft text-budget-neon",
-                )}
-              >
-                <Icon className="h-4 w-4" aria-hidden="true" />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        "flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-budget-muted transition-colors hover:bg-budget-hover hover:text-budget-text",
+                        active && "bg-budget-soft text-budget-neon",
+                      )}
+                    >
+                      <Icon className="h-4 w-4" aria-hidden="true" />
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
         </div>
 
         <div className="mt-6 border-t border-budget-border pt-4">

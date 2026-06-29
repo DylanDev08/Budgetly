@@ -1,10 +1,11 @@
 "use client";
 
 import { CrudPanel, type CrudField } from "@/features/crud/CrudPanel";
+import { financeCategoryOptions } from "@/lib/domain/categories";
 
 const fields: CrudField[] = [
   { name: "name", label: "Nombre", type: "text", placeholder: "Presupuesto mensual", required: true },
-  { name: "category", label: "Categoria", type: "text", placeholder: "Comida, ocio, transporte" },
+  { name: "category", label: "Categoria", type: "select", options: financeCategoryOptions },
   {
     name: "type",
     label: "Tipo",

@@ -1,34 +1,74 @@
 import {
+  ArrowLeftRight,
   Bot,
   CalendarDays,
   CreditCard,
   FileText,
   Flag,
-  Gauge,
-  Home,
   Landmark,
+  LayoutDashboard,
   ListChecks,
   Receipt,
   Settings,
   ShieldCheck,
+  Sparkles,
   Target,
+  TrendingUp,
   WalletCards,
+  type LucideIcon,
 } from "lucide-react";
 
-export const navigationItems = [
-  { label: "Dashboard", href: "/dashboard", icon: Home },
-  { label: "Movimientos", href: "/movements", icon: WalletCards },
-  { label: "Presupuestos", href: "/budgets", icon: Gauge },
-  { label: "Obligaciones", href: "/obligations", icon: Receipt },
-  { label: "Horarios", href: "/schedule", icon: CalendarDays },
-  { label: "Rutinas", href: "/routines", icon: ListChecks },
-  { label: "Metas", href: "/goals", icon: Target },
-  { label: "Inversion", href: "/investments", icon: Landmark },
-  { label: "Bot asistente", href: "/assistant", icon: Bot },
-  { label: "Mercado Pago", href: "/mercado-pago", icon: CreditCard },
-  { label: "Comprobantes", href: "/invoices", icon: FileText },
-  { label: "Ajustes", href: "/settings", icon: Settings },
-] as const;
+type NavigationItem = {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+};
+
+type NavigationGroup = {
+  label: string;
+  description: string;
+  items: NavigationItem[];
+};
+
+export const navigationGroups: NavigationGroup[] = [
+  {
+    label: "Operacion diaria",
+    description: "Carga, consulta y comprobantes",
+    items: [
+      { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+      { label: "Movimientos", href: "/movements", icon: ArrowLeftRight },
+      { label: "Comprobantes", href: "/invoices", icon: FileText },
+      { label: "Mercado Pago", href: "/mercado-pago", icon: CreditCard },
+    ],
+  },
+  {
+    label: "Planificacion",
+    description: "Limites, pagos y rutina",
+    items: [
+      { label: "Presupuestos", href: "/budgets", icon: WalletCards },
+      { label: "Obligaciones", href: "/obligations", icon: Receipt },
+      { label: "Horarios", href: "/schedule", icon: CalendarDays },
+      { label: "Rutinas", href: "/routines", icon: ListChecks },
+    ],
+  },
+  {
+    label: "Crecimiento",
+    description: "Metas, asistencia e inversion",
+    items: [
+      { label: "Metas", href: "/goals", icon: Target },
+      { label: "Bot asistente", href: "/assistant", icon: Bot },
+      { label: "Inversion", href: "/investments", icon: Landmark },
+      { label: "Premium", href: "/premium", icon: Sparkles },
+    ],
+  },
+  {
+    label: "Cuenta",
+    description: "Preferencias y seguridad",
+    items: [{ label: "Ajustes", href: "/settings", icon: Settings }],
+  },
+];
+
+export const navigationItems = navigationGroups.flatMap((group) => group.items);
 
 export const secondaryNavigationItems = [
   { label: "Terminos legales", href: "/legal/terms", icon: Flag },
@@ -36,4 +76,4 @@ export const secondaryNavigationItems = [
   { label: "Seguridad", href: "/legal/security", icon: ShieldCheck },
 ] as const;
 
-export const adminNavigationItem = { label: "Admin", href: "/admin", icon: ShieldCheck } as const;
+export const adminNavigationItem = { label: "Admin", href: "/admin", icon: TrendingUp } as const;

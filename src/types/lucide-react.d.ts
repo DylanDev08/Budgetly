@@ -11,7 +11,10 @@ declare module "lucide-react" {
   >;
 
   export const AlertTriangle: LucideIcon;
+  export const Activity: LucideIcon;
   export const ArrowDownCircle: LucideIcon;
+  export const ArrowLeftRight: LucideIcon;
+  export const ArrowRight: LucideIcon;
   export const ArrowUpCircle: LucideIcon;
   export const Bot: LucideIcon;
   export const CalendarDays: LucideIcon;
@@ -22,19 +25,25 @@ declare module "lucide-react" {
   export const Flag: LucideIcon;
   export const Gauge: LucideIcon;
   export const Home: LucideIcon;
+  export const KeyRound: LucideIcon;
   export const Landmark: LucideIcon;
+  export const LayoutDashboard: LucideIcon;
   export const ListChecks: LucideIcon;
   export const Menu: LucideIcon;
   export const Pencil: LucideIcon;
   export const Plus: LucideIcon;
   export const Receipt: LucideIcon;
   export const Save: LucideIcon;
+  export const Search: LucideIcon;
   export const Send: LucideIcon;
   export const Settings: LucideIcon;
   export const ShieldCheck: LucideIcon;
+  export const Sparkles: LucideIcon;
   export const Target: LucideIcon;
+  export const TrendingUp: LucideIcon;
   export const Trash2: LucideIcon;
   export const Upload: LucideIcon;
+  export const Users: LucideIcon;
   export const Wallet: LucideIcon;
   export const WalletCards: LucideIcon;
   export const X: LucideIcon;

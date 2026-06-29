@@ -1,0 +1,9 @@
+<svg width="240" height="64" viewBox="0 0 240 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" rx="18" fill="#06110A"/>
+  <path d="M18.667 42V16H33.6C40.533 16 44.4 19.333 44.4 24.4C44.4 27.6 42.8 30 40.267 31.2C44 32.267 46.267 35.067 46.267 39.2C46.267 45.2 41.6 49.333 33.733 49.333H24.667C21.2 49.333 18.667 46.8 18.667 42Z" fill="#15803D"/>
+  <path d="M26 27.6H32.8C35.2 27.6 36.667 26.4 36.667 24.533C36.667 22.533 35.2 21.333 32.8 21.333H26V27.6ZM26 42.533H33.867C36.667 42.533 38.4 41.067 38.4 38.667C38.4 36.267 36.667 34.933 33.867 34.933H26V42.533Z" fill="#F8FAFC"/>
+  <path d="M17.067 46.533C28.667 50.267 38.667 48.267 46.933 40" stroke="#65F49A" stroke-width="4" stroke-linecap="round"/>
+  <path d="M46.4 33.467V40.8H39.067" stroke="#65F49A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="82" y="31" fill="#F8FAFC" font-family="Inter, Arial, sans-serif" font-size="23" font-weight="700">Budgetly</text>
+  <text x="82" y="49" fill="#9CA3AF" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="500">Finanzas personales</text>
+</svg>
