@@ -4,9 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 import { AlertTriangle, ArrowDownCircle, ArrowUpCircle, Landmark, Receipt, Target, Wallet } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { CommandCard } from "@/components/ui/CommandCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Progress } from "@/components/ui/Progress";
+import { ProgressRing } from "@/components/ui/ProgressRing";
 import { StatCard } from "@/components/ui/StatCard";
+import { StatTrend } from "@/components/ui/StatTrend";
 
 type DashboardSummary = {
   currency: string;
@@ -16,6 +19,17 @@ type DashboardSummary = {
   weeklyExpense: number;
   budgetUsed: number;
   health: "bien" | "advertencia" | "critico";
+  pulse: {
+    score: number;
+    status: string;
+    factors: Record<string, number>;
+  };
+  nextBestAction: {
+    title: string;
+    description: string;
+    href: string;
+  };
+  plan: string;
   topCategory: { name: string; amount: number } | null;
   recentTransactions: { id: string; name: string; kind: string; amount: number; date: string }[];
   obligations: { id: string; name: string; amount: number; dueDay: number }[];
@@ -57,6 +71,29 @@ export function FinancialOverview() {
 
   return (
     <div className="grid gap-5">
+      <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
+        <Card className="bg-budget-card">
+          <CardHeader>
+            <div className="flex items-center justify-between gap-4">
+              <CardTitle>Budgetly Pulse Score</CardTitle>
+              <Badge tone={data.pulse.score >= 75 ? "success" : data.pulse.score >= 55 ? "warning" : "danger"}>
+                {data.pulse.status}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="grid gap-5 sm:grid-cols-[auto_1fr] sm:items-center">
+            <ProgressRing value={data.pulse.score} label="Pulse" />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <StatTrend label="Control de gastos" value={`${data.pulse.factors.expenseControl}%`} tone={data.pulse.factors.expenseControl >= 70 ? "good" : "warning"} />
+              <StatTrend label="Obligaciones" value={`${data.pulse.factors.obligationCompliance}%`} tone={data.pulse.factors.obligationCompliance >= 70 ? "good" : "warning"} />
+              <StatTrend label="Metas" value={`${data.pulse.factors.goalProgress}%`} />
+              <StatTrend label="Ahorro" value={`${data.pulse.factors.savingsLevel}%`} />
+            </div>
+          </CardContent>
+        </Card>
+        <CommandCard title={data.nextBestAction.title} description={data.nextBestAction.description} href={data.nextBestAction.href} />
+      </div>
+
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         <StatCard title="Ingresos del mes" value={money(data.income, data.currency)} helper="Movimientos cargados" icon={ArrowUpCircle} />
         <StatCard title="Gastos del mes" value={money(data.expense, data.currency)} helper="Egresos registrados" icon={ArrowDownCircle} />

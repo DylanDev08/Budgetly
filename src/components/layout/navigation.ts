@@ -32,39 +32,49 @@ type NavigationGroup = {
 
 export const navigationGroups: NavigationGroup[] = [
   {
-    label: "Operacion diaria",
-    description: "Carga, consulta y comprobantes",
+    label: "Principal",
+    description: "Command center y escenarios",
     items: [
       { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-      { label: "Movimientos", href: "/movements", icon: ArrowLeftRight },
-      { label: "Comprobantes", href: "/invoices", icon: FileText },
-      { label: "Mercado Pago", href: "/mercado-pago", icon: CreditCard },
+      { label: "Timeline", href: "/timeline", icon: CalendarDays },
+      { label: "Decisiones", href: "/decisions", icon: Target },
     ],
   },
   {
-    label: "Planificacion",
-    description: "Limites, pagos y rutina",
+    label: "Finanzas",
+    description: "Carga, limites y comprobantes",
     items: [
+      { label: "Movimientos", href: "/movements", icon: ArrowLeftRight },
       { label: "Presupuestos", href: "/budgets", icon: WalletCards },
       { label: "Obligaciones", href: "/obligations", icon: Receipt },
-      { label: "Horarios", href: "/schedule", icon: CalendarDays },
-      { label: "Rutinas", href: "/routines", icon: ListChecks },
+      { label: "Comprobantes", href: "/invoices", icon: FileText },
     ],
   },
   {
-    label: "Crecimiento",
-    description: "Metas, asistencia e inversion",
+    label: "Vida y metas",
+    description: "Tiempo, habitos y objetivos",
     items: [
+      { label: "Horarios", href: "/schedule", icon: CalendarDays },
+      { label: "Rutinas", href: "/routines", icon: ListChecks },
       { label: "Metas", href: "/goals", icon: Target },
+    ],
+  },
+  {
+    label: "Inteligencia",
+    description: "Asistencia, mercado y sync",
+    items: [
       { label: "Bot asistente", href: "/assistant", icon: Bot },
       { label: "Inversion", href: "/investments", icon: Landmark },
-      { label: "Premium", href: "/premium", icon: Sparkles },
+      { label: "Mercado Pago", href: "/mercado-pago", icon: CreditCard },
     ],
   },
   {
     label: "Cuenta",
     description: "Preferencias y seguridad",
-    items: [{ label: "Ajustes", href: "/settings", icon: Settings }],
+    items: [
+      { label: "Premium", href: "/premium", icon: Sparkles },
+      { label: "Ajustes", href: "/settings", icon: Settings },
+    ],
   },
 ];
 

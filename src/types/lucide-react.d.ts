@@ -29,6 +29,8 @@ declare module "lucide-react" {
   export const Landmark: LucideIcon;
   export const LayoutDashboard: LucideIcon;
   export const ListChecks: LucideIcon;
+  export const Lock: LucideIcon;
+  export const Mail: LucideIcon;
   export const Menu: LucideIcon;
   export const Pencil: LucideIcon;
   export const Plus: LucideIcon;

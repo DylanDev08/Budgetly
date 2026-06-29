@@ -211,6 +211,103 @@ model MarketSignal {
   @@map("market_signals")
 }
 
+model SubscriptionPlan {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  price     Decimal
+  currency  String   @default("ARS")
+  interval  String   @default("monthly")
+  features  Json
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  subscriptions UserSubscription[]
+
+  @@map("subscription_plans")
+}
+
+model UserSubscription {
+  id                  String    @id @default(uuid())
+  userId              String    @map("user_id")
+  planId              String    @map("plan_id")
+  status              String    @default("inactive")
+  provider            String    @default("manual")
+  providerReferenceId String?   @map("provider_reference_id")
+  currentPeriodStart  DateTime? @map("current_period_start")
+  currentPeriodEnd    DateTime? @map("current_period_end")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  plan SubscriptionPlan @relation(fields: [planId], references: [id])
+
+  @@index([userId, status])
+  @@map("user_subscriptions")
+}
+
+model FeatureFlag {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  name        String
+  description String?
+  minimumPlan String   @default("free") @map("minimum_plan")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("feature_flags")
+}
+
+model PaymentEvent {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  provider        String
+  eventType       String   @map("event_type")
+  providerEventId String?  @map("provider_event_id")
+  payload         Json?
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@map("payment_events")
+}
+
+model PulseSnapshot {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  score     Int
+  status    String
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@map("pulse_snapshots")
+}
+
+model DecisionSimulation {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  title     String
+  type      String
+  amount    Decimal
+  result    Json
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@map("decision_simulations")
+}
+
+model AdminAction {
+  id        String   @id @default(uuid())
+  adminId   String   @map("admin_id")
+  targetId  String?  @map("target_id")
+  action    String
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([adminId, createdAt])
+  @@map("admin_actions")
+}
+
 model AuditLog {
   id        String   @id @default(uuid())
   userId    String   @map("user_id")

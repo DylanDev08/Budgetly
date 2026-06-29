@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/api/auth";
+import { calculateBudgetlyPulse } from "@/lib/domain/budgetlyPulse";
+import { getNextBestAction } from "@/lib/domain/nextBestAction";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
@@ -45,6 +47,28 @@ export async function GET() {
   }
 
   const topCategory = [...categories.entries()].sort((a, b) => b[1] - a[1])[0] ?? null;
+  const pulse = calculateBudgetlyPulse({
+    income,
+    expenses: expense,
+    weeklyExpense,
+    monthlyBudget,
+    weeklyBudget: Number(profile?.weeklyBudget?.toString() ?? 0),
+    monthlySavingsGoal: Number(profile?.monthlySavingsGoal?.toString() ?? 0),
+    pendingObligations: obligations.length,
+    activeGoals: goals.map((goal) => ({
+      targetAmount: Number(goal.targetAmount.toString()),
+      currentAmount: Number(goal.currentAmount.toString()),
+    })),
+  });
+  const nextBestAction = getNextBestAction({
+    income,
+    expenses: expense,
+    budgetUsed,
+    pendingObligations: obligations.length,
+    activeGoals: goals.length,
+    mercadoPagoConnected: Boolean(mercadoPago),
+    plan: profile?.plan ?? "free",
+  });
 
   return NextResponse.json({
     currency: profile?.currency ?? "ARS",
@@ -54,6 +78,9 @@ export async function GET() {
     weeklyExpense,
     budgetUsed,
     health: budgetUsed >= 120 ? "critico" : budgetUsed >= 80 ? "advertencia" : "bien",
+    pulse,
+    nextBestAction,
+    plan: profile?.plan ?? "free",
     topCategory: topCategory ? { name: topCategory[0], amount: topCategory[1] } : null,
     recentTransactions: transactions.slice(0, 5).map((item) => ({
       id: item.id,

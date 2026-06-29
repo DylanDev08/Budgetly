@@ -11,6 +11,13 @@ alter table mercado_pago_accounts enable row level security;
 alter table assistant_messages enable row level security;
 alter table market_signals enable row level security;
 alter table audit_logs enable row level security;
+alter table subscription_plans enable row level security;
+alter table user_subscriptions enable row level security;
+alter table feature_flags enable row level security;
+alter table payment_events enable row level security;
+alter table pulse_snapshots enable row level security;
+alter table decision_simulations enable row level security;
+alter table admin_actions enable row level security;
 
 drop policy if exists "profiles_owner_all" on profiles;
 create policy "profiles_owner_all" on profiles
@@ -103,3 +110,42 @@ create policy "audit_logs_owner_read_insert" on audit_logs
 for all
 using (auth.uid()::text = user_id)
 with check (auth.uid()::text = user_id);
+
+drop policy if exists "subscription_plans_read_all" on subscription_plans;
+create policy "subscription_plans_read_all" on subscription_plans
+for select
+using (active = true);
+
+drop policy if exists "user_subscriptions_owner_all" on user_subscriptions;
+create policy "user_subscriptions_owner_all" on user_subscriptions
+for all
+using (auth.uid()::text = user_id)
+with check (auth.uid()::text = user_id);
+
+drop policy if exists "feature_flags_read_all" on feature_flags;
+create policy "feature_flags_read_all" on feature_flags
+for select
+using (active = true);
+
+drop policy if exists "payment_events_owner_all" on payment_events;
+create policy "payment_events_owner_all" on payment_events
+for all
+using (auth.uid()::text = user_id)
+with check (auth.uid()::text = user_id);
+
+drop policy if exists "pulse_snapshots_owner_all" on pulse_snapshots;
+create policy "pulse_snapshots_owner_all" on pulse_snapshots
+for all
+using (auth.uid()::text = user_id)
+with check (auth.uid()::text = user_id);
+
+drop policy if exists "decision_simulations_owner_all" on decision_simulations;
+create policy "decision_simulations_owner_all" on decision_simulations
+for all
+using (auth.uid()::text = user_id)
+with check (auth.uid()::text = user_id);
+
+drop policy if exists "admin_actions_admin_read" on admin_actions;
+create policy "admin_actions_admin_read" on admin_actions
+for select
+using (auth.uid()::text = admin_id);
