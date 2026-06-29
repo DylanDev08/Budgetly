@@ -2,22 +2,39 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { BudgetlyLogo } from "@/components/brand/BudgetlyLogo";
 import { cn } from "@/lib/utils/classNames";
-import { navigationItems, secondaryNavigationItems } from "@/components/layout/navigation";
+import { adminNavigationItem, navigationItems, secondaryNavigationItems } from "@/components/layout/navigation";
+
+type SettingsResponse = {
+  item?: {
+    role?: string;
+  };
+};
 
 export function Sidebar() {
   const pathname = usePathname();
+  const profileQuery = useQuery<SettingsResponse>({
+    queryKey: ["/api/settings", "sidebar"],
+    queryFn: async () => {
+      const response = await fetch("/api/settings");
+
+      if (!response.ok) {
+        return {};
+      }
+
+      return response.json();
+    },
+  });
+  const items = profileQuery.data?.item?.role === "admin"
+    ? [adminNavigationItem, ...secondaryNavigationItems]
+    : secondaryNavigationItems;
 
   return (
-    <aside className="hidden h-screen w-72 shrink-0 border-r border-budget-border bg-budget-surface lg:sticky lg:top-0 lg:flex lg:flex-col">
+    <aside className="hidden h-screen w-72 shrink-0 border-r border-budget-border bg-black lg:sticky lg:top-0 lg:flex lg:flex-col">
       <Link href="/dashboard" className="flex h-20 items-center gap-3 border-b border-budget-border px-6">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-budget-green text-base font-bold text-budget-bg shadow-glow">
-          B
-        </div>
-        <div>
-          <p className="text-base font-semibold text-budget-text">Budgetly</p>
-          <p className="text-xs font-medium text-budget-muted">Finanzas personales</p>
-        </div>
+        <BudgetlyLogo />
       </Link>
 
       <nav className="flex-1 overflow-y-auto px-4 py-5">
@@ -43,7 +60,7 @@ export function Sidebar() {
         </div>
 
         <div className="mt-6 border-t border-budget-border pt-4">
-          {secondaryNavigationItems.map((item) => {
+          {items.map((item) => {
             const active = pathname === item.href;
             const Icon = item.icon;
 

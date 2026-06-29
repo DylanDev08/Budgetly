@@ -100,6 +100,8 @@ export const assistantQuestionSchema = z.object({
 
 export const adminProfileUpdateSchema = z.object({
   fullName: z.string().trim().min(2).max(120).optional(),
+  role: z.enum(["user", "admin"]).optional(),
+  plan: z.enum(["free", "premium", "pro"]).optional(),
   currency: z.enum(["ARS", "USD", "BRL", "EUR"]).optional(),
   alertMode: z.enum(["serio", "normal", "humoristico"]).optional(),
   riskProfile: z.enum(["conservador", "moderado", "agresivo"]).optional(),

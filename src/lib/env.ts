@@ -5,9 +5,23 @@ export function getPublicSupabaseEnv() {
   };
 }
 
-export function hasSupabaseEnv() {
+export function getMissingSupabaseEnvKeys() {
   const { url, anonKey } = getPublicSupabaseEnv();
-  return Boolean(url && anonKey);
+  const missing = [];
+
+  if (!url) {
+    missing.push("NEXT_PUBLIC_SUPABASE_URL");
+  }
+
+  if (!anonKey) {
+    missing.push("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  }
+
+  return missing;
+}
+
+export function hasSupabaseEnv() {
+  return getMissingSupabaseEnvKeys().length === 0;
 }
 
 export function hasDatabaseEnv() {

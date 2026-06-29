@@ -10,10 +10,11 @@ const config: Config = {
     extend: {
       colors: {
         budget: {
-          bg: "#050A06",
-          surface: "#0B120D",
-          card: "#101914",
-          hover: "#142119",
+          bg: "#010302",
+          surface: "#050A06",
+          header: "#031609",
+          card: "#0B120D",
+          hover: "#102016",
           green: "#22C55E",
           neon: "#39FF88",
           dark: "#166534",

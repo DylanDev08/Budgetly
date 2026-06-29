@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { hasDatabaseEnv } from "@/lib/env";
 import { getAuthenticatedUser } from "@/lib/auth/getAuthenticatedUser";
-
-const fallbackAdminEmails = ["dylansalcedo333@gmail.com"];
+import { createAuditLog } from "@/lib/services/audit.service";
+import { ensureUserProfile } from "@/lib/services/profile.service";
 
 export async function requireUser() {
   const { user, error } = await getAuthenticatedUser();
@@ -26,13 +26,9 @@ export function isAdminEmail(email?: string | null) {
     return false;
   }
 
-  const configuredEmails = (process.env.ADMIN_EMAILS ?? "")
-    .split(",")
-    .map((value) => value.trim().toLowerCase())
-    .filter(Boolean);
-  const admins = configuredEmails.length > 0 ? configuredEmails : fallbackAdminEmails;
+  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
 
-  return admins.includes(email.toLowerCase());
+  return Boolean(adminEmail && email.toLowerCase() === adminEmail);
 }
 
 export async function requireAdmin() {
@@ -42,12 +38,32 @@ export async function requireAdmin() {
     return auth;
   }
 
-  if (!isAdminEmail(auth.user.email)) {
+  const profile = await ensureUserProfile({
+    userId: auth.user.id,
+    fullName: auth.user.user_metadata.full_name ?? auth.user.user_metadata.name ?? auth.user.email ?? "Usuario Budgetly",
+    email: auth.user.email ?? "",
+  });
+
+  if (profile.role !== "admin") {
+    await createAuditLog({
+      userId: auth.user.id,
+      action: "ADMIN_ACCESS_DENIED",
+      entity: "profile",
+      entityId: profile.id,
+    });
+
     return {
       user: null,
       response: NextResponse.json({ error: "Acceso admin requerido." }, { status: 403 }),
     };
   }
 
-  return auth;
+  await createAuditLog({
+    userId: auth.user.id,
+    action: "ADMIN_ACCESS_GRANTED",
+    entity: "profile",
+    entityId: profile.id,
+  });
+
+  return { ...auth, profile };
 }

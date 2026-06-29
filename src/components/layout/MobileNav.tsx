@@ -1,18 +1,39 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils/classNames";
-import { navigationItems, secondaryNavigationItems } from "@/components/layout/navigation";
+import { adminNavigationItem, navigationItems, secondaryNavigationItems } from "@/components/layout/navigation";
+
+type SettingsResponse = {
+  item?: {
+    role?: string;
+  };
+};
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const items = [...navigationItems, ...secondaryNavigationItems];
+  const profileQuery = useQuery<SettingsResponse>({
+    queryKey: ["/api/settings", "mobile-nav"],
+    queryFn: async () => {
+      const response = await fetch("/api/settings");
+
+      if (!response.ok) {
+        return {};
+      }
+
+      return response.json();
+    },
+  });
+  const secondaryItems =
+    profileQuery.data?.item?.role === "admin" ? [adminNavigationItem, ...secondaryNavigationItems] : secondaryNavigationItems;
+  const items = [...navigationItems, ...secondaryItems];
 
   return (
     <div className="lg:hidden">

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/api/auth";
 import { serializeProfile } from "@/lib/api/serializers";
 import { prisma } from "@/lib/prisma";
+import { createAuditLog } from "@/lib/services/audit.service";
 import { ensureUserProfile } from "@/lib/services/profile.service";
 import { settingsSchema } from "@/lib/validations/finance.schema";
 
@@ -42,6 +43,14 @@ export async function PUT(request: Request) {
       userId: auth.user.id,
       ...parsed.data,
     },
+  });
+
+  await createAuditLog({
+    userId: auth.user.id,
+    action: "SETTINGS_UPDATED",
+    entity: "profile",
+    entityId: profile.id,
+    metadata: { fields: Object.keys(parsed.data) },
   });
 
   return NextResponse.json({ item: serializeProfile(profile) });

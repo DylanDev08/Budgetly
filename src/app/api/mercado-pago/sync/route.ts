@@ -5,8 +5,9 @@ import { getInvoiceType } from "@/lib/domain/invoiceEngine";
 import { prisma } from "@/lib/prisma";
 import { getClientIp, rateLimit } from "@/lib/security/rateLimit";
 import { decryptSecret } from "@/lib/security/encryption";
+import { createAuditLog } from "@/lib/services/audit.service";
 import { buildInternalInvoiceNumber } from "@/lib/services/invoice.service";
-import { getNormalizedMercadoPagoMovements } from "@/lib/services/mercadoPago.service";
+import { getMockMercadoPagoMovements, getNormalizedMercadoPagoMovements } from "@/lib/services/mercadoPago.service";
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
@@ -29,20 +30,15 @@ export async function POST(request: Request) {
   let accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
   const account = await prisma.mercadoPagoAccount.findUnique({ where: { userId: user.id } });
 
-  if (!accessToken && account) {
+  if (!accessToken && account?.accessTokenEncrypted) {
     accessToken = decryptSecret(account.accessTokenEncrypted);
   }
 
-  if (!accessToken) {
-    return NextResponse.json(
-      { error: "Conecta Mercado Pago o configura MERCADO_PAGO_ACCESS_TOKEN en el backend." },
-      { status: 409 },
-    );
-  }
-
-  const movements = await getNormalizedMercadoPagoMovements(accessToken);
+  const syncMode = accessToken ? "real" : "mock";
+  const movements = accessToken ? await getNormalizedMercadoPagoMovements(accessToken) : getMockMercadoPagoMovements();
   let imported = 0;
   let skipped = 0;
+  const createdInvoiceIds: string[] = [];
 
   for (const movement of movements) {
     const existing = await prisma.transaction.findUnique({
@@ -92,22 +88,36 @@ export async function POST(request: Request) {
       data: { invoiceId: invoice.id },
     });
 
+    createdInvoiceIds.push(invoice.id);
     imported += 1;
   }
 
-  if (account) {
-    await prisma.mercadoPagoAccount.update({
-      where: { userId: user.id },
-      data: {
-        lastSync: new Date(),
-        syncStatus: "ok",
-      },
-    });
-  }
+  await prisma.mercadoPagoAccount.upsert({
+    where: { userId: user.id },
+    create: {
+      userId: user.id,
+      accountEmail: user.email ?? null,
+      lastSync: new Date(),
+      syncStatus: syncMode === "mock" ? "mock_synced" : "ok",
+    },
+    update: {
+      accountEmail: user.email ?? account?.accountEmail ?? null,
+      lastSync: new Date(),
+      syncStatus: syncMode === "mock" ? "mock_synced" : "ok",
+    },
+  });
+
+  await createAuditLog({
+    userId: user.id,
+    action: syncMode === "mock" ? "MP_MOCK_SYNC" : "MP_REAL_SYNC",
+    entity: "mercado_pago_account",
+    metadata: { imported, skipped, invoiceCount: createdInvoiceIds.length },
+  });
 
   return NextResponse.json({
     imported,
     skipped,
+    mode: syncMode,
     status: "ok",
   });
 }

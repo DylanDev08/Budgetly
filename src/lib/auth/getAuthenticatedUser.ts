@@ -1,9 +1,11 @@
-import { hasSupabaseEnv } from "@/lib/env";
+import { getMissingSupabaseEnvKeys, hasSupabaseEnv } from "@/lib/env";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export async function getAuthenticatedUser() {
   if (!hasSupabaseEnv()) {
-    return { user: null, error: "Supabase no esta configurado." };
+    const missing = getMissingSupabaseEnvKeys().join(", ");
+
+    return { user: null, error: `Supabase Auth no esta configurado. Faltan: ${missing}.` };
   }
 
   const supabase = await createServerSupabaseClient();

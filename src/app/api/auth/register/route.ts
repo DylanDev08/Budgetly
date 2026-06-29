@@ -5,6 +5,32 @@ import { ensureUserProfile } from "@/lib/services/profile.service";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { registerSchema } from "@/features/auth/schemas";
 
+function getSafeSignUpError(message: string) {
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes("already") || normalized.includes("registered") || normalized.includes("exists")) {
+    return "Ese email ya esta registrado. Inicia sesion con esa cuenta.";
+  }
+
+  if (normalized.includes("signup") && normalized.includes("disabled")) {
+    return "El registro por email esta deshabilitado en Supabase Auth.";
+  }
+
+  if (normalized.includes("password")) {
+    return "La clave no cumple la politica de seguridad configurada en Supabase.";
+  }
+
+  if (normalized.includes("redirect") || normalized.includes("not allowed")) {
+    return "La URL de redireccion no esta permitida en Supabase Auth.";
+  }
+
+  if (normalized.includes("rate") || normalized.includes("too many")) {
+    return "Supabase limito los intentos. Espera un momento y volve a probar.";
+  }
+
+  return "No se pudo crear la cuenta. Revisa Auth Providers y Redirect URLs en Supabase.";
+}
+
 export async function POST(request: Request) {
   const ip = getClientIp(request);
   const limit = rateLimit({ key: `register:${ip}`, limit: 3, windowMs: 5 * 60_000 });
@@ -34,7 +60,7 @@ export async function POST(request: Request) {
     email,
     password,
     options: {
-      emailRedirectTo: `${getAppUrl()}/dashboard`,
+      emailRedirectTo: `${getAppUrl()}/auth/callback`,
       data: {
         full_name: fullName,
       },
@@ -42,7 +68,13 @@ export async function POST(request: Request) {
   });
 
   if (error) {
-    return NextResponse.json({ error: "No se pudo crear la cuenta." }, { status: 400 });
+    console.warn("Supabase signUp failed", {
+      status: error.status,
+      code: error.code,
+      message: error.message,
+    });
+
+    return NextResponse.json({ error: getSafeSignUpError(error.message) }, { status: error.status ?? 400 });
   }
 
   if (!data.user) {

@@ -1,46 +1,31 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { loginSchema, type LoginValues } from "@/features/auth/schemas";
+import { createClient } from "@/lib/supabase/client";
 
-export function LoginForm() {
-  const router = useRouter();
-  const [formError, setFormError] = useState<string | null>(null);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
+const oauthErrors: Record<string, string> = {
+  oauth: "No se pudo completar el login con Google.",
+  missing_oauth_code: "Google no devolvio el codigo de autenticacion.",
+  oauth_code_verifier:
+    "Supabase no encontro el verificador de login. Volve a iniciar desde esta pantalla, sin reutilizar pestanas viejas.",
+  oauth_redirect:
+    "La URL de callback no coincide con las URLs permitidas en Supabase Auth.",
+  oauth_provider:
+    "Google o Supabase rechazaron la configuracion del proveedor OAuth.",
+  oauth_exchange_failed: "Supabase no pudo validar la sesion de Google.",
+};
 
-  async function onSubmit(values: LoginValues) {
-    setFormError(null);
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
+export function LoginForm({ error }: { error?: string }) {
+  async function signInWithGoogle() {
+    const supabase = createClient();
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
-    const result = await response.json();
-
-    if (!response.ok) {
-      setFormError(result.error ?? "No se pudo iniciar sesion.");
-      return;
-    }
-
-    router.push("/dashboard");
-    router.refresh();
   }
 
   return (
@@ -48,27 +33,19 @@ export function LoginForm() {
       <CardHeader>
         <CardTitle>Ingresar a Budgetly</CardTitle>
       </CardHeader>
-      <CardContent>
-        <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
-          <Input label="Email" type="email" autoComplete="email" error={errors.email?.message} {...register("email")} />
-          <Input
-            label="Clave"
-            type="password"
-            autoComplete="current-password"
-            error={errors.password?.message}
-            {...register("password")}
-          />
-          {formError ? <p className="rounded-lg border border-red-500/25 bg-red-500/10 p-3 text-sm font-medium text-red-300">{formError}</p> : null}
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Ingresando..." : "Ingresar"}
-          </Button>
-          <p className="text-sm text-budget-muted">
-            No tenes cuenta?{" "}
-            <Link href="/auth/register" className="font-semibold text-budget-neon hover:text-budget-green">
-              Crear cuenta
-            </Link>
+      <CardContent className="grid gap-4">
+        {error ? (
+          <p className="rounded-lg border border-red-500/25 bg-red-500/10 p-3 text-sm font-medium text-red-300">
+            {oauthErrors[error] ?? "No se pudo iniciar sesion."}
           </p>
-        </form>
+        ) : null}
+        <Button type="button" onClick={signInWithGoogle}>
+          <ShieldCheck className="h-4 w-4" />
+          Entrar con Google
+        </Button>
+        <p className="text-sm leading-6 text-budget-muted">
+          Budgetly usa Supabase Auth con Google OAuth. No guardamos claves propias en la app.
+        </p>
       </CardContent>
     </Card>
   );

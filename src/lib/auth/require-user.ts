@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { ensureProfile } from "@/lib/auth/ensure-profile";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
-export default async function HomePage() {
+export async function requireUser() {
   const supabase = await createServerSupabaseClient();
   const {
     data: { user },
@@ -14,5 +14,5 @@ export default async function HomePage() {
 
   const profile = await ensureProfile(user);
 
-  redirect(profile.role === "admin" ? "/admin" : "/dashboard");
+  return { user, profile };
 }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { answerBudgetlyQuestion } from "@/lib/domain/assistantEngine";
 import { requireUser } from "@/lib/api/auth";
 import { prisma } from "@/lib/prisma";
+import { createAuditLog } from "@/lib/services/audit.service";
 import { assistantQuestionSchema } from "@/lib/validations/finance.schema";
 
 export async function POST(request: Request) {
@@ -59,6 +60,13 @@ export async function POST(request: Request) {
       { userId: auth.user.id, role: "user", content: parsed.data.question },
       { userId: auth.user.id, role: "assistant", content: answer },
     ],
+  });
+
+  await createAuditLog({
+    userId: auth.user.id,
+    action: "ASSISTANT_MESSAGE_CREATED",
+    entity: "assistant_message",
+    metadata: { messages: 2 },
   });
 
   return NextResponse.json({ answer });

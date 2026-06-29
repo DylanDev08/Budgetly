@@ -13,6 +13,8 @@ type Profile = {
   userId: string;
   fullName: string | null;
   email: string;
+  role: string;
+  plan: string;
   currency: string;
   alertMode: string;
   riskProfile: string;
@@ -49,6 +51,8 @@ export function AdminProfilesPanel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           fullName: profile.fullName,
+          role: profile.role,
+          plan: profile.plan,
           currency: profile.currency,
           alertMode: profile.alertMode,
           riskProfile: profile.riskProfile,
@@ -82,6 +86,15 @@ export function AdminProfilesPanel() {
               </CardHeader>
               <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <Input label="Nombre" value={current.fullName ?? ""} onChange={(event) => setEditing({ ...current, fullName: event.target.value })} />
+                <Select label="Rol" value={current.role} onChange={(event) => setEditing({ ...current, role: event.target.value })}>
+                  <option value="user">Usuario</option>
+                  <option value="admin">Admin</option>
+                </Select>
+                <Select label="Plan" value={current.plan} onChange={(event) => setEditing({ ...current, plan: event.target.value })}>
+                  <option value="free">Free</option>
+                  <option value="premium">Premium</option>
+                  <option value="pro">Pro</option>
+                </Select>
                 <Select label="Moneda" value={current.currency} onChange={(event) => setEditing({ ...current, currency: event.target.value })}>
                   <option value="ARS">ARS</option>
                   <option value="USD">USD</option>

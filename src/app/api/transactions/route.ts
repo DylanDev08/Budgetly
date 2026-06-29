@@ -3,6 +3,7 @@ import { getInvoiceType } from "@/lib/domain/invoiceEngine";
 import { requireUser } from "@/lib/api/auth";
 import { serializeTransaction } from "@/lib/api/serializers";
 import { prisma } from "@/lib/prisma";
+import { createAuditLog } from "@/lib/services/audit.service";
 import { buildInternalInvoiceNumber } from "@/lib/services/invoice.service";
 import { transactionSchema } from "@/lib/validations/finance.schema";
 
@@ -85,6 +86,23 @@ export async function POST(request: Request) {
       include: { invoice: true },
     });
   });
+
+  await createAuditLog({
+    userId: auth.user.id,
+    action: "TRANSACTION_CREATED",
+    entity: "transaction",
+    entityId: transaction.id,
+    metadata: { kind: transaction.kind, source: transaction.source, category: transaction.category },
+  });
+  if (transaction.invoice) {
+    await createAuditLog({
+      userId: auth.user.id,
+      action: "INVOICE_CREATED",
+      entity: "invoice",
+      entityId: transaction.invoice.id,
+      metadata: { type: transaction.invoice.type, source: transaction.invoice.source },
+    });
+  }
 
   return NextResponse.json({ item: serializeTransaction(transaction) }, { status: 201 });
 }

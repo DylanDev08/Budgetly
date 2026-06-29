@@ -1,6 +1,33 @@
 import type { NormalizedMercadoPagoMovement } from "@/types/mercadoPago";
 import type { MercadoPagoPaymentSearchResponse } from "@/types/mercadoPago";
 
+export function getMockMercadoPagoMovements(date = new Date()): NormalizedMercadoPagoMovement[] {
+  const today = date.toISOString().slice(0, 10);
+
+  return [
+    {
+      externalId: "mp_mock_001",
+      kind: "expense",
+      name: "Compra kiosco",
+      amount: 2500,
+      category: "Comida",
+      type: "variable",
+      date: today,
+      source: "mercado_pago",
+    },
+    {
+      externalId: "mp_mock_002",
+      kind: "income",
+      name: "Transferencia recibida",
+      amount: 20000,
+      category: "Entrada",
+      type: "unico",
+      date: today,
+      source: "mercado_pago",
+    },
+  ];
+}
+
 function normalizePayment(payment: NonNullable<MercadoPagoPaymentSearchResponse["results"]>[number]): NormalizedMercadoPagoMovement | null {
   if (!payment.id || !payment.transaction_amount || !payment.date_created) {
     return null;
