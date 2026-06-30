@@ -10,10 +10,12 @@ export async function GET() {
     return auth.response;
   }
 
-  const [profiles, transactions, auditLogs] = await Promise.all([
+  const [profiles, transactions, auditLogs, uploads, extractions] = await Promise.all([
     prisma.profile.count(),
     prisma.transaction.count(),
     prisma.auditLog.count(),
+    prisma.uploadedAsset.count().catch(() => 0),
+    prisma.extractedFinancialData.count().catch(() => 0),
   ]);
 
   return NextResponse.json({
@@ -28,6 +30,8 @@ export async function GET() {
         profiles,
         transactions,
         auditLogs,
+        uploads,
+        extractions,
       },
     },
   });

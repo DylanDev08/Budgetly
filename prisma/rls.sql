@@ -17,6 +17,10 @@ alter table feature_flags enable row level security;
 alter table payment_events enable row level security;
 alter table pulse_snapshots enable row level security;
 alter table decision_simulations enable row level security;
+alter table uploaded_assets enable row level security;
+alter table extracted_financial_data enable row level security;
+alter table client_activities enable row level security;
+alter table client_notes enable row level security;
 alter table admin_actions enable row level security;
 
 drop policy if exists "profiles_owner_all" on profiles;
@@ -145,7 +149,63 @@ for all
 using (auth.uid()::text = user_id)
 with check (auth.uid()::text = user_id);
 
+drop policy if exists "uploaded_assets_owner_all" on uploaded_assets;
+create policy "uploaded_assets_owner_all" on uploaded_assets
+for all
+using (auth.uid()::text = user_id)
+with check (auth.uid()::text = user_id);
+
+drop policy if exists "extracted_financial_data_owner_all" on extracted_financial_data;
+create policy "extracted_financial_data_owner_all" on extracted_financial_data
+for all
+using (auth.uid()::text = user_id)
+with check (auth.uid()::text = user_id);
+
+drop policy if exists "client_activities_owner_all" on client_activities;
+create policy "client_activities_owner_all" on client_activities
+for all
+using (auth.uid()::text = user_id)
+with check (auth.uid()::text = user_id);
+
+drop policy if exists "client_notes_owner_read" on client_notes;
+drop policy if exists "client_notes_admin_only" on client_notes;
+create policy "client_notes_admin_only" on client_notes
+for all
+using (
+  exists (
+    select 1
+    from profiles
+    where profiles.user_id = auth.uid()::text
+      and profiles.role = 'admin'
+  )
+)
+with check (
+  exists (
+    select 1
+    from profiles
+    where profiles.user_id = auth.uid()::text
+      and profiles.role = 'admin'
+  )
+);
+
 drop policy if exists "admin_actions_admin_read" on admin_actions;
 create policy "admin_actions_admin_read" on admin_actions
 for select
 using (auth.uid()::text = admin_id);
+
+do $$
+begin
+  if exists (select 1 from pg_roles where rolname = 'anon') then
+    execute 'revoke all on table mercado_pago_accounts from anon';
+    execute 'revoke all on table payment_events from anon';
+    execute 'revoke all on table client_notes from anon';
+    execute 'revoke all on table admin_actions from anon';
+  end if;
+
+  if exists (select 1 from pg_roles where rolname = 'authenticated') then
+    execute 'revoke all on table mercado_pago_accounts from authenticated';
+    execute 'revoke all on table payment_events from authenticated';
+    execute 'revoke all on table client_notes from authenticated';
+    execute 'revoke all on table admin_actions from authenticated';
+  end if;
+end $$;

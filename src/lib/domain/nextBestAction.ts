@@ -6,6 +6,8 @@ export type NextBestActionInput = {
   activeGoals: number;
   mercadoPagoConnected: boolean;
   plan: string;
+  pendingExtractions?: number;
+  pendingUploads?: number;
 };
 
 export type NextBestAction = {
@@ -22,6 +24,24 @@ export function getNextBestAction(input: NextBestActionInput): NextBestAction {
       title: "Carga tu primer ingreso",
       description: "Sin ingresos registrados, Budgetly no puede calcular salud financiera real.",
       href: "/movements",
+    };
+  }
+
+  if ((input.pendingExtractions ?? 0) > 0) {
+    return {
+      key: "confirm_extraction",
+      title: "Confirma datos extraidos",
+      description: "Tenes comprobantes con datos detectados esperando revision.",
+      href: "/inbox",
+    };
+  }
+
+  if ((input.pendingUploads ?? 0) > 0) {
+    return {
+      key: "review_photo",
+      title: "Revisa fotos subidas",
+      description: "Hay imagenes pendientes de ordenar en tu Smart Inbox.",
+      href: "/inbox",
     };
   }
 

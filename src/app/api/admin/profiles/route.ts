@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api/auth";
-import { serializeProfile } from "@/lib/api/serializers";
+import { serializeAdminProfile } from "@/lib/api/serializers";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
@@ -15,5 +15,5 @@ export async function GET() {
     take: 200,
   });
 
-  return NextResponse.json({ items: profiles.map(serializeProfile) });
+  return NextResponse.json({ items: profiles.map(serializeAdminProfile) });
 }

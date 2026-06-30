@@ -25,6 +25,7 @@ declare module "lucide-react" {
   export const Flag: LucideIcon;
   export const Gauge: LucideIcon;
   export const Home: LucideIcon;
+  export const Inbox: LucideIcon;
   export const KeyRound: LucideIcon;
   export const Landmark: LucideIcon;
   export const LayoutDashboard: LucideIcon;
@@ -45,6 +46,7 @@ declare module "lucide-react" {
   export const TrendingUp: LucideIcon;
   export const Trash2: LucideIcon;
   export const Upload: LucideIcon;
+  export const User: LucideIcon;
   export const Users: LucideIcon;
   export const Wallet: LucideIcon;
   export const WalletCards: LucideIcon;

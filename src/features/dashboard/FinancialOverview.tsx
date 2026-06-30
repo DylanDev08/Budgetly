@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { AlertTriangle, ArrowDownCircle, ArrowUpCircle, Landmark, Receipt, Target, Wallet } from "lucide-react";
+import { AlertTriangle, ArrowDownCircle, ArrowRight, ArrowUpCircle, Landmark, Receipt, Target, Wallet, type LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { CommandCard } from "@/components/ui/CommandCard";
@@ -71,6 +71,13 @@ export function FinancialOverview() {
 
   return (
     <div className="grid gap-5">
+      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <StatCard title="Ingresos del mes" value={money(data.income, data.currency)} helper="Movimientos cargados" icon={ArrowUpCircle} />
+        <StatCard title="Gastos del mes" value={money(data.expense, data.currency)} helper="Egresos registrados" icon={ArrowDownCircle} />
+        <StatCard title="Balance actual" value={money(data.balance, data.currency)} helper="Ingresos menos gastos" icon={Wallet} />
+        <StatCard title="Gastos de la semana" value={money(data.weeklyExpense, data.currency)} helper="Desde inicio de semana" icon={Landmark} />
+      </div>
+
       <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
         <Card className="bg-budget-card">
           <CardHeader>
@@ -92,13 +99,6 @@ export function FinancialOverview() {
           </CardContent>
         </Card>
         <CommandCard title={data.nextBestAction.title} description={data.nextBestAction.description} href={data.nextBestAction.href} />
-      </div>
-
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard title="Ingresos del mes" value={money(data.income, data.currency)} helper="Movimientos cargados" icon={ArrowUpCircle} />
-        <StatCard title="Gastos del mes" value={money(data.expense, data.currency)} helper="Egresos registrados" icon={ArrowDownCircle} />
-        <StatCard title="Balance actual" value={money(data.balance, data.currency)} helper="Ingresos menos gastos" icon={Wallet} />
-        <StatCard title="Gastos de la semana" value={money(data.weeklyExpense, data.currency)} helper="Desde inicio de semana" icon={Landmark} />
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
@@ -146,28 +146,89 @@ export function FinancialOverview() {
         </Card>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-2">
-        {data.recentTransactions.length > 0 ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Ultimos movimientos</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-3">
-              {data.recentTransactions.map((item) => (
-                <div key={item.id} className="flex items-center justify-between rounded-lg border border-budget-border bg-budget-surface p-3">
-                  <span className="text-sm font-medium text-budget-text">{item.name}</span>
-                  <span className="text-sm text-budget-muted">{money(item.amount, data.currency)}</span>
+      <div className="grid gap-5 xl:grid-cols-[1.25fr_0.75fr]">
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between gap-4">
+              <CardTitle>Actividad cotidiana</CardTitle>
+              <Badge tone={data.recentTransactions.length > 0 ? "success" : "neutral"}>{data.recentTransactions.length} recientes</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="grid gap-3">
+            {data.recentTransactions.length === 0 ? (
+              <EmptyState icon={ArrowDownCircle} title="Sin movimientos recientes" description="Carga movimientos manuales o sincroniza Mercado Pago." />
+            ) : null}
+            {data.recentTransactions.map((item) => (
+              <div key={item.id} className="grid gap-3 rounded-lg border border-budget-border bg-budget-surface p-4 sm:grid-cols-[1fr_auto] sm:items-center">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-semibold text-budget-text">{item.name}</p>
+                    <Badge tone={item.kind === "income" ? "success" : "danger"}>{item.kind === "income" ? "ingreso" : "egreso"}</Badge>
+                  </div>
+                  <p className="mt-1 text-xs text-budget-dim">{item.date}</p>
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        ) : (
-          <EmptyState icon={ArrowDownCircle} title="Sin movimientos recientes" description="Carga movimientos manuales o sincroniza Mercado Pago." />
-        )}
-        <div className="grid gap-5">
-          <EmptyState icon={Receipt} title={`${data.obligations.length} obligaciones pendientes`} description="Las obligaciones pendientes se listan en su modulo." />
-          <EmptyState icon={Target} title={`${data.goals.length} metas activas`} description="El progreso detallado vive en Metas." />
+                <p className={`text-sm font-semibold ${item.kind === "income" ? "text-budget-neon" : "text-red-300"}`}>
+                  {money(item.amount, data.currency)}
+                </p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Agenda de dinero</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <DashboardQueue
+              icon={Receipt}
+              title={`${data.obligations.length} obligaciones pendientes`}
+              items={data.obligations.map((item) => `${item.name} / vence dia ${item.dueDay} / ${money(item.amount, data.currency)}`)}
+            />
+            <DashboardQueue
+              icon={Target}
+              title={`${data.goals.length} metas activas`}
+              items={data.goals.map((item) => `${item.name} / ${money(item.currentAmount, data.currency)} de ${money(item.targetAmount, data.currency)}`)}
+            />
+            <div className="rounded-lg border border-budget-border bg-budget-surface p-4">
+              <div className="flex items-start gap-3">
+                <ArrowRight className="mt-0.5 h-4 w-4 text-budget-neon" />
+                <p className="text-sm leading-6 text-budget-muted">
+                  Mercado Pago esta {data.mercadoPagoConnected ? "conectado" : "pendiente"} y los comprobantes recientes son {data.invoices.length}.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function DashboardQueue({
+  icon: Icon,
+  title,
+  items,
+}: {
+  icon: LucideIcon;
+  title: string;
+  items: string[];
+}) {
+  return (
+    <div className="rounded-lg border border-budget-border bg-budget-surface p-4">
+      <div className="flex items-center gap-3">
+        <div className="rounded-lg bg-budget-soft p-2 text-budget-neon">
+          <Icon className="h-4 w-4" />
         </div>
+        <p className="font-semibold text-budget-text">{title}</p>
+      </div>
+      <div className="mt-3 grid gap-2">
+        {items.length === 0 ? <p className="text-sm text-budget-muted">Sin registros pendientes.</p> : null}
+        {items.slice(0, 4).map((item) => (
+          <p key={item} className="rounded-lg border border-budget-border bg-budget-card px-3 py-2 text-sm text-budget-muted">
+            {item}
+          </p>
+        ))}
       </div>
     </div>
   );

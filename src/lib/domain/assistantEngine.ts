@@ -26,11 +26,25 @@ type AssistantGoal = {
   status: string;
 };
 
+type AssistantUpload = {
+  fileName: string;
+  status: string;
+};
+
+type AssistantExtraction = {
+  concept: string | null;
+  amount: number | null;
+  status: string;
+  confidence: number;
+};
+
 export type AssistantContext = {
   transactions: AssistantTransaction[];
   budgets: AssistantBudget[];
   obligations: AssistantObligation[];
   goals: AssistantGoal[];
+  uploads: AssistantUpload[];
+  extractions: AssistantExtraction[];
   currency: string;
 };
 
@@ -84,6 +98,7 @@ export function answerBudgetlyQuestion(question: string, context: AssistantConte
   const topCategory = topExpenseCategory(context.transactions);
   const pendingObligations = context.obligations.filter((obligation) => obligation.status === "pendiente");
   const activeGoals = context.goals.filter((goal) => goal.status === "activa");
+  const pendingExtractions = context.extractions.filter((item) => item.status !== "confirmed" && item.status !== "rejected");
 
   if (context.transactions.length === 0 && context.budgets.length === 0 && pendingObligations.length === 0) {
     return "Todavia no tengo datos suficientes para responder con precision. Carga algunos movimientos, presupuestos u obligaciones y te ayudo con un diagnostico real.";
@@ -150,6 +165,23 @@ export function answerBudgetlyQuestion(question: string, context: AssistantConte
     }
 
     return `Podrias evaluar inversion educativa con cautela: balance positivo de ${formatMoney(balance, context.currency)} y ${pendingObligations.length} obligaciones pendientes. Reserva fondo de emergencia antes de asumir riesgo.`;
+  }
+
+  if (query.includes("foto") || query.includes("comprobante") || query.includes("extrajiste") || query.includes("imagen")) {
+    if (context.uploads.length === 0 && context.extractions.length === 0) {
+      return "Todavia no veo fotos o comprobantes subidos. Podes subir una imagen aca y la dejo pendiente de confirmacion antes de registrar cualquier movimiento.";
+    }
+
+    if (pendingExtractions.length > 0) {
+      const summary = pendingExtractions
+        .slice(0, 3)
+        .map((item) => `${item.concept ?? "Dato sin concepto"} (${Math.round(item.confidence * 100)}% confianza)`)
+        .join("; ");
+
+      return `Tenes ${pendingExtractions.length} extracciones pendientes de revisar: ${summary}. No voy a crear movimientos sin tu confirmacion.`;
+    }
+
+    return `Tenes ${context.uploads.length} fotos cargadas y ${context.extractions.length} extracciones procesadas. No hay datos pendientes de confirmar.`;
   }
 
   return `Veo ingresos por ${formatMoney(income, context.currency)}, gastos por ${formatMoney(expense, context.currency)} y balance de ${formatMoney(balance, context.currency)}. Preguntame por gastos, metas, obligaciones, presupuesto o inversion y te respondo con esos datos.`;

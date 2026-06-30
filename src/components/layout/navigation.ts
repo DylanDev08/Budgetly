@@ -5,6 +5,8 @@ import {
   CreditCard,
   FileText,
   Flag,
+  Gauge,
+  Inbox,
   Landmark,
   LayoutDashboard,
   ListChecks,
@@ -14,6 +16,8 @@ import {
   Sparkles,
   Target,
   TrendingUp,
+  User,
+  Users,
   WalletCards,
   type LucideIcon,
 } from "lucide-react";
@@ -35,6 +39,7 @@ export const navigationGroups: NavigationGroup[] = [
     label: "Principal",
     description: "Command center y escenarios",
     items: [
+      { label: "Inbox", href: "/inbox", icon: Inbox },
       { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
       { label: "Timeline", href: "/timeline", icon: CalendarDays },
       { label: "Decisiones", href: "/decisions", icon: Target },
@@ -73,6 +78,7 @@ export const navigationGroups: NavigationGroup[] = [
     description: "Preferencias y seguridad",
     items: [
       { label: "Premium", href: "/premium", icon: Sparkles },
+      { label: "Perfil", href: "/profile", icon: User },
       { label: "Ajustes", href: "/settings", icon: Settings },
     ],
   },
@@ -87,3 +93,19 @@ export const secondaryNavigationItems = [
 ] as const;
 
 export const adminNavigationItem = { label: "Admin", href: "/admin", icon: TrendingUp } as const;
+
+export const adminNavigationItems = [
+  adminNavigationItem,
+  { label: "Clientes", href: "/admin/clients", icon: Users },
+  { label: "Usuarios", href: "/admin/users", icon: User },
+  { label: "Movimientos", href: "/admin/transactions", icon: ArrowLeftRight },
+  { label: "Presupuestos", href: "/admin/budgets", icon: WalletCards },
+  { label: "Metas", href: "/admin/goals", icon: Target },
+  { label: "Planes", href: "/admin/plans", icon: Sparkles },
+  { label: "Feature flags", href: "/admin/feature-flags", icon: Flag },
+  { label: "Fotos / Archivos", href: "/admin/uploads", icon: FileText },
+  { label: "Asistente", href: "/admin/assistant-records", icon: Bot },
+  { label: "Mercado Pago", href: "/admin/mercado-pago", icon: CreditCard },
+  { label: "Audit logs", href: "/admin/audit-logs", icon: ShieldCheck },
+  { label: "Salud sistema", href: "/admin/system-health", icon: Gauge },
+] as const;

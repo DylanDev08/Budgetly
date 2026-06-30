@@ -24,6 +24,8 @@ export async function ensureUserProfile({ userId, fullName, email }: EnsureUserP
         fullName,
         email,
         role: existing.role === "admin" ? "admin" : role,
+        status: "active",
+        lastLoginAt: new Date(),
       },
     });
 
@@ -47,6 +49,8 @@ export async function ensureUserProfile({ userId, fullName, email }: EnsureUserP
       email,
       role,
       plan: "free",
+      status: "active",
+      lastLoginAt: new Date(),
       currency: "ARS",
       alertMode: "normal",
       riskProfile: "conservador",

@@ -13,6 +13,9 @@ model Profile {
   email              String   @unique
   role               String   @default("user")
   plan               String   @default("free")
+  avatarUrl          String?  @map("avatar_url")
+  status             String   @default("active")
+  lastLoginAt        DateTime? @map("last_login_at")
   currency           String   @default("ARS")
   alertMode          String   @default("normal") @map("alert_mode")
   riskProfile        String   @default("conservador") @map("risk_profile")
@@ -294,6 +297,77 @@ model DecisionSimulation {
 
   @@index([userId, createdAt])
   @@map("decision_simulations")
+}
+
+model UploadedAsset {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  kind      String
+  bucket    String
+  path      String
+  fileName  String   @map("file_name")
+  mimeType  String   @map("mime_type")
+  sizeBytes Int      @map("size_bytes")
+  status    String   @default("uploaded")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  extractions ExtractedFinancialData[]
+
+  @@index([userId, createdAt])
+  @@map("uploaded_assets")
+}
+
+model ExtractedFinancialData {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  uploadedAssetId String   @map("uploaded_asset_id")
+  amount          Decimal?
+  currency        String?
+  date            DateTime?
+  merchant        String?
+  concept         String?
+  category        String?
+  kind            String?
+  type            String?
+  confidence      Decimal  @default(0)
+  rawText         String?  @map("raw_text")
+  status          String   @default("pending")
+  confirmedAt     DateTime? @map("confirmed_at")
+  transactionId   String?  @map("transaction_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  uploadedAsset UploadedAsset @relation(fields: [uploadedAssetId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([uploadedAssetId])
+  @@map("extracted_financial_data")
+}
+
+model ClientActivity {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  action    String
+  title     String
+  summary   String?
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@map("client_activities")
+}
+
+model ClientNote {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  adminId   String   @map("admin_id")
+  title     String
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId, createdAt])
+  @@map("client_notes")
 }
 
 model AdminAction {

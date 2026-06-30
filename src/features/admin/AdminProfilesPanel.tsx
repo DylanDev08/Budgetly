@@ -191,7 +191,7 @@ export function AdminProfilesPanel() {
                 className="h-10 w-full rounded-lg border border-budget-border bg-budget-surface pl-10 pr-3 text-sm text-budget-text outline-none transition focus:border-budget-green focus:ring-2 focus:ring-budget-green/20"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Buscar por nombre, email, rol o plan"
+                placeholder="Buscar por nombre, email enmascarado, rol o plan"
               />
             </label>
           </div>
@@ -244,7 +244,7 @@ export function AdminProfilesPanel() {
 
                     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                       <Input label="Nombre y apellido" value={current.fullName ?? ""} onChange={(event) => setEditing({ ...current, fullName: event.target.value })} />
-                      <Input label="Gmail" value={current.email} disabled title="El email viene de Supabase Auth." />
+                      <Input label="Email enmascarado" value={current.email} disabled title="El email real queda gestionado por Supabase Auth." />
                       <Select label="Rol" value={current.role} onChange={(event) => setEditing({ ...current, role: event.target.value })}>
                         <option value="user">Usuario</option>
                         <option value="admin">Admin</option>
@@ -340,7 +340,7 @@ export function AdminProfilesPanel() {
               <div className="rounded-lg border border-budget-border bg-budget-surface p-4">
                 <p className="font-semibold text-budget-text">Datos visibles para control</p>
                 <p className="mt-2 text-sm leading-6 text-budget-muted">
-                  Nombre, email, proveedor, rol, plan, verificacion de email, fecha de creacion, ultimo ingreso y auditoria de acciones administrativas.
+                  Nombre, email enmascarado, proveedor, rol, plan, verificacion de email, fecha de creacion, ultimo ingreso y auditoria de acciones administrativas.
                 </p>
               </div>
             </div>

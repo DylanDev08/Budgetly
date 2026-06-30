@@ -21,3 +21,8 @@ export const adminFeatureFlagSchema = z.object({
 });
 
 export const adminFeatureFlagUpdateSchema = adminFeatureFlagSchema.partial();
+
+export const adminClientNoteSchema = z.object({
+  title: z.string().trim().min(2).max(120),
+  content: z.string().trim().min(2).max(1200),
+});

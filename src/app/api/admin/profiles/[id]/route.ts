@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api/auth";
-import { serializeProfile } from "@/lib/api/serializers";
+import { serializeAdminProfile } from "@/lib/api/serializers";
 import { prisma } from "@/lib/prisma";
 import { adminProfileUpdateSchema, idSchema } from "@/lib/validations/finance.schema";
 
@@ -33,5 +33,5 @@ export async function PUT(request: Request, context: RouteContext) {
     data: parsed.data,
   });
 
-  return NextResponse.json({ item: serializeProfile(profile) });
+  return NextResponse.json({ item: serializeAdminProfile(profile) });
 }

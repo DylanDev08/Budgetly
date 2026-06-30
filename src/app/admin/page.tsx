@@ -1,6 +1,6 @@
 import { ShieldCheck } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { AdminProfilesPanel } from "@/features/admin/AdminProfilesPanel";
+import { AdminDashboardOverview } from "@/features/admin/AdminDashboardOverview";
 import { requireAdmin } from "@/lib/auth/require-admin";
 
 export default async function AdminPage() {
@@ -8,8 +8,8 @@ export default async function AdminPage() {
 
   return (
     <>
-      <PageHeader title="Admin" description="Control de usuarios, perfiles locales, planes y logins externos." icon={ShieldCheck} />
-      <AdminProfilesPanel />
+      <PageHeader title="Admin" description="Dashboard operativo de clientes, finanzas, seguridad y actividad." icon={ShieldCheck} />
+      <AdminDashboardOverview />
     </>
   );
 }

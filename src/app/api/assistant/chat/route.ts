@@ -19,12 +19,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Pregunta invalida", issues: parsed.error.flatten() }, { status: 400 });
   }
 
-  const [profile, transactions, budgets, obligations, goals] = await Promise.all([
+  const [profile, transactions, budgets, obligations, goals, uploads, extractions] = await Promise.all([
     prisma.profile.findUnique({ where: { userId: auth.user.id } }),
     prisma.transaction.findMany({ where: { userId: auth.user.id }, orderBy: { date: "desc" }, take: 200 }),
     prisma.budget.findMany({ where: { userId: auth.user.id } }),
     prisma.obligation.findMany({ where: { userId: auth.user.id } }),
     prisma.goal.findMany({ where: { userId: auth.user.id } }),
+    prisma.uploadedAsset.findMany({ where: { userId: auth.user.id }, orderBy: { createdAt: "desc" }, take: 50 }).catch(() => []),
+    prisma.extractedFinancialData.findMany({ where: { userId: auth.user.id }, orderBy: { createdAt: "desc" }, take: 50 }).catch(() => []),
   ]);
 
   const answer = answerBudgetlyQuestion(parsed.data.question, {
@@ -52,6 +54,16 @@ export async function POST(request: Request) {
       targetAmount: Number(goal.targetAmount.toString()),
       currentAmount: Number(goal.currentAmount.toString()),
       status: goal.status,
+    })),
+    uploads: uploads.map((upload) => ({
+      fileName: upload.fileName,
+      status: upload.status,
+    })),
+    extractions: extractions.map((extraction) => ({
+      concept: extraction.concept,
+      amount: extraction.amount ? Number(extraction.amount.toString()) : null,
+      status: extraction.status,
+      confidence: Number(extraction.confidence.toString()),
     })),
   });
 

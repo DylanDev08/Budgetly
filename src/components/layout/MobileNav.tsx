@@ -9,7 +9,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { BudgetlyLogo } from "@/components/brand/BudgetlyLogo";
 import { cn } from "@/lib/utils/classNames";
-import { adminNavigationItem, navigationGroups, secondaryNavigationItems } from "@/components/layout/navigation";
+import { adminNavigationItems, navigationGroups, secondaryNavigationItems } from "@/components/layout/navigation";
 
 type SettingsResponse = {
   item?: {
@@ -32,8 +32,7 @@ export function MobileNav() {
       return response.json();
     },
   });
-  const secondaryItems =
-    profileQuery.data?.item?.role === "admin" ? [adminNavigationItem, ...secondaryNavigationItems] : secondaryNavigationItems;
+  const isAdmin = profileQuery.data?.item?.role === "admin";
 
   return (
     <div className="lg:hidden">
@@ -92,10 +91,36 @@ export function MobileNav() {
                     </div>
                   </section>
                 ))}
+                {isAdmin ? (
+                  <section className="grid gap-2 border-t border-budget-border pt-4">
+                    <p className="px-3 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-budget-dim">Admin</p>
+                    <div className="grid gap-1">
+                      {adminNavigationItems.map((item) => {
+                        const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+                        const Icon = item.icon;
+
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setOpen(false)}
+                            className={cn(
+                              "flex h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium text-budget-muted hover:bg-budget-hover hover:text-budget-text",
+                              active && "bg-budget-soft text-budget-neon",
+                            )}
+                          >
+                            <Icon className="h-4 w-4" aria-hidden="true" />
+                            {item.label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </section>
+                ) : null}
                 <section className="grid gap-2 border-t border-budget-border pt-4">
                   <p className="px-3 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-budget-dim">Sistema</p>
                   <div className="grid gap-1">
-                    {secondaryItems.map((item) => {
+                    {secondaryNavigationItems.map((item) => {
                       const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
                       const Icon = item.icon;
 

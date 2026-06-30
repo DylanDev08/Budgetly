@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/api/auth";
 import { prisma } from "@/lib/prisma";
 import { createAuditLog } from "@/lib/services/audit.service";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { maskEmail, maskIdentifier } from "@/lib/utils/privacy";
 
 function unique(values: (string | null | undefined)[]) {
   return [...new Set(values.filter(Boolean) as string[])];
@@ -67,8 +68,8 @@ export async function GET() {
       const identityProviders = user.identities?.map((identity) => identity.provider) ?? [];
 
       return {
-        id: user.id,
-        email: user.email ?? profile?.email ?? "sin-email",
+        id: maskIdentifier(user.id, 5),
+        email: maskEmail(user.email ?? profile?.email ?? null),
         fullName: profile?.fullName ?? String(metadata?.full_name ?? metadata?.name ?? "Usuario sin nombre"),
         providers: unique([user.app_metadata.provider as string | undefined, ...identityProviders]),
         role: profile?.role ?? "sin perfil",

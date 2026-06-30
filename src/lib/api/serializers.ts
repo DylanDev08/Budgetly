@@ -8,6 +8,7 @@ import type {
   ScheduleBlock,
   Transaction,
 } from "@prisma/client";
+import { maskEmail } from "@/lib/utils/privacy";
 
 function money(value: { toString(): string } | number | null) {
   return value === null ? 0 : Number(value.toString());
@@ -24,8 +25,19 @@ export function serializeProfile(profile: Profile) {
     weeklyBudget: money(profile.weeklyBudget),
     variableBudget: money(profile.variableBudget),
     monthlySavingsGoal: money(profile.monthlySavingsGoal),
+    lastLoginAt: profile.lastLoginAt?.toISOString() ?? null,
     createdAt: profile.createdAt.toISOString(),
     updatedAt: profile.updatedAt.toISOString(),
+  };
+}
+
+export function serializeAdminProfile(profile: Profile) {
+  const item = serializeProfile(profile);
+
+  return {
+    ...item,
+    email: maskEmail(profile.email),
+    emailMasked: maskEmail(profile.email),
   };
 }
 

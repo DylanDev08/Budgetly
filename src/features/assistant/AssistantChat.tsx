@@ -5,6 +5,9 @@ import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { AssistantMessageBubble } from "@/features/assistant/AssistantMessageBubble";
+import { ExtractedDataPreview } from "@/features/assistant/ExtractedDataPreview";
+import { ImageUploadBox, type Extraction } from "@/features/assistant/ImageUploadBox";
 
 type Message = {
   role: "user" | "assistant";
@@ -35,6 +38,7 @@ export function AssistantChat() {
     },
   ]);
   const [loading, setLoading] = useState(false);
+  const [extraction, setExtraction] = useState<Extraction | null>(null);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -70,14 +74,34 @@ export function AssistantChat() {
         <CardContent className="grid gap-4">
           <div className="grid max-h-[52vh] gap-3 overflow-y-auto rounded-lg border border-budget-border bg-budget-surface p-4">
             {messages.map((message, index) => (
-              <div
+              <AssistantMessageBubble
                 key={`${message.role}-${index}`}
-                className={message.role === "user" ? "ml-auto max-w-[85%] rounded-lg bg-budget-green px-4 py-3 text-sm font-medium text-budget-bg" : "mr-auto max-w-[85%] rounded-lg border border-budget-border bg-budget-card px-4 py-3 text-sm leading-6 text-budget-text"}
-              >
-                {message.content}
-              </div>
+                role={message.role}
+                content={message.content}
+              />
             ))}
           </div>
+          <ImageUploadBox
+            onExtraction={(nextExtraction) => {
+              setExtraction(nextExtraction);
+              setMessages((current) => [
+                ...current,
+                {
+                  role: "assistant",
+                  content: "Detecte datos en la imagen. Revisalos abajo antes de crear un movimiento.",
+                },
+              ]);
+            }}
+          />
+          {extraction ? (
+            <ExtractedDataPreview
+              extraction={extraction}
+              onDone={(content) => {
+                setExtraction(null);
+                setMessages((current) => [...current, { role: "assistant", content }]);
+              }}
+            />
+          ) : null}
           <form className="flex flex-col gap-3 sm:flex-row" onSubmit={submit}>
             <Input
               aria-label="Pregunta"

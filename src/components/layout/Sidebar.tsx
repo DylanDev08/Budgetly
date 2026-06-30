@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { BudgetlyLogo } from "@/components/brand/BudgetlyLogo";
 import { cn } from "@/lib/utils/classNames";
-import { adminNavigationItem, navigationGroups, secondaryNavigationItems } from "@/components/layout/navigation";
+import { adminNavigationItems, navigationGroups, secondaryNavigationItems } from "@/components/layout/navigation";
 
 type SettingsResponse = {
   item?: {
@@ -27,9 +27,7 @@ export function Sidebar() {
       return response.json();
     },
   });
-  const items = profileQuery.data?.item?.role === "admin"
-    ? [adminNavigationItem, ...secondaryNavigationItems]
-    : secondaryNavigationItems;
+  const isAdmin = profileQuery.data?.item?.role === "admin";
 
   return (
     <aside className="hidden h-screen w-72 shrink-0 border-r border-budget-border bg-black lg:sticky lg:top-0 lg:flex lg:flex-col">
@@ -69,8 +67,34 @@ export function Sidebar() {
           ))}
         </div>
 
+        {isAdmin ? (
+          <div className="mt-6 border-t border-budget-border pt-4">
+            <div className="px-3 pb-2">
+              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-budget-dim">Admin</p>
+            </div>
+            {adminNavigationItems.map((item) => {
+              const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const Icon = item.icon;
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-budget-muted transition-colors hover:bg-budget-hover hover:text-budget-text",
+                    active && "bg-budget-soft text-budget-neon",
+                  )}
+                >
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        ) : null}
+
         <div className="mt-6 border-t border-budget-border pt-4">
-          {items.map((item) => {
+          {secondaryNavigationItems.map((item) => {
             const active = pathname === item.href;
             const Icon = item.icon;
 
