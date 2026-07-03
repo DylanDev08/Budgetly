@@ -19,12 +19,12 @@ type DashboardSummary = {
   weeklyExpense: number;
   budgetUsed: number;
   health: "bien" | "advertencia" | "critico";
-  pulse: {
+  pulse?: {
     score: number;
     status: string;
     factors: Record<string, number>;
   };
-  nextBestAction: {
+  nextBestAction?: {
     title: string;
     description: string;
     href: string;
@@ -69,6 +69,25 @@ export function FinancialOverview() {
     return null;
   }
 
+  const pulse = data.pulse ?? {
+    score: 50,
+    status: "Inicial",
+    factors: {
+      expenseControl: 50,
+      obligationCompliance: 50,
+      goalProgress: 50,
+      savingsLevel: 50,
+    },
+  };
+  const nextBestAction = data.nextBestAction ?? {
+    title: "Carga tus primeros datos",
+    description: "Budgetly necesita movimientos, presupuestos y metas para darte una lectura real.",
+    href: "/movements",
+  };
+  const flowTotal = Math.max(data.income + data.expense, 1);
+  const incomeWidth = Math.round((data.income / flowTotal) * 100);
+  const expenseWidth = Math.max(0, 100 - incomeWidth);
+
   return (
     <div className="grid gap-5">
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
@@ -83,22 +102,22 @@ export function FinancialOverview() {
           <CardHeader>
             <div className="flex items-center justify-between gap-4">
               <CardTitle>Budgetly Pulse Score</CardTitle>
-              <Badge tone={data.pulse.score >= 75 ? "success" : data.pulse.score >= 55 ? "warning" : "danger"}>
-                {data.pulse.status}
+              <Badge tone={pulse.score >= 75 ? "success" : pulse.score >= 55 ? "warning" : "danger"}>
+                {pulse.status}
               </Badge>
             </div>
           </CardHeader>
           <CardContent className="grid gap-5 sm:grid-cols-[auto_1fr] sm:items-center">
-            <ProgressRing value={data.pulse.score} label="Pulse" />
+            <ProgressRing value={pulse.score} label="Pulse" />
             <div className="grid gap-3 sm:grid-cols-2">
-              <StatTrend label="Control de gastos" value={`${data.pulse.factors.expenseControl}%`} tone={data.pulse.factors.expenseControl >= 70 ? "good" : "warning"} />
-              <StatTrend label="Obligaciones" value={`${data.pulse.factors.obligationCompliance}%`} tone={data.pulse.factors.obligationCompliance >= 70 ? "good" : "warning"} />
-              <StatTrend label="Metas" value={`${data.pulse.factors.goalProgress}%`} />
-              <StatTrend label="Ahorro" value={`${data.pulse.factors.savingsLevel}%`} />
+              <StatTrend label="Control de gastos" value={`${pulse.factors.expenseControl ?? 50}%`} tone={(pulse.factors.expenseControl ?? 50) >= 70 ? "good" : "warning"} />
+              <StatTrend label="Obligaciones" value={`${pulse.factors.obligationCompliance ?? 50}%`} tone={(pulse.factors.obligationCompliance ?? 50) >= 70 ? "good" : "warning"} />
+              <StatTrend label="Metas" value={`${pulse.factors.goalProgress ?? 50}%`} />
+              <StatTrend label="Ahorro" value={`${pulse.factors.savingsLevel ?? 50}%`} />
             </div>
           </CardContent>
         </Card>
-        <CommandCard title={data.nextBestAction.title} description={data.nextBestAction.description} href={data.nextBestAction.href} />
+        <CommandCard title={nextBestAction.title} description={nextBestAction.description} href={nextBestAction.href} />
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
@@ -121,6 +140,20 @@ export function FinancialOverview() {
               <p className="text-sm leading-6 text-budget-muted">
                 Alertas por 80%, 100% y 120%. Configura el presupuesto mensual en Ajustes o Presupuestos.
               </p>
+              <div className="pt-3">
+                <div className="mb-2 flex items-center justify-between text-xs text-budget-dim">
+                  <span>Estado del mes</span>
+                  <span>{money(data.income + data.expense, data.currency)} movidos</span>
+                </div>
+                <div className="flex h-3 overflow-hidden rounded-full bg-budget-surface">
+                  <span className="bg-budget-green" style={{ width: `${incomeWidth}%` }} />
+                  <span className="bg-red-500" style={{ width: `${expenseWidth}%` }} />
+                </div>
+                <div className="mt-3 flex flex-wrap gap-3 text-xs text-budget-muted">
+                  <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-budget-green" />Ingresos {incomeWidth}%</span>
+                  <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-red-500" />Gastos {expenseWidth}%</span>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>

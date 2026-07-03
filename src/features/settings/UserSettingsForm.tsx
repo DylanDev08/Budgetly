@@ -51,6 +51,7 @@ function mapSettings(item: Record<string, string | number>): SettingsValues {
 function SettingsFormBody({ initialValues }: { initialValues: SettingsValues }) {
   const [values, setValues] = useState<SettingsValues>(initialValues);
   const [message, setMessage] = useState<string | null>(null);
+  const [section, setSection] = useState<"account" | "money" | "alerts">("account");
   const mutation = useMutation({
     mutationFn: () =>
       apiJson("/api/settings", {
@@ -73,56 +74,97 @@ function SettingsFormBody({ initialValues }: { initialValues: SettingsValues }) 
     mutation.mutate();
   }
 
+  const sections = [
+    { id: "account", label: "Cuenta", helper: "Nombre, email y moneda" },
+    { id: "money", label: "Dinero", helper: "Presupuestos y ahorro" },
+    { id: "alerts", label: "Alertas", helper: "Riesgo, tono y tema" },
+  ] as const;
+
   return (
-    <form className="grid gap-5 p-5 sm:p-8 xl:grid-cols-[1fr_0.8fr]" onSubmit={submit}>
+    <form className="grid gap-5 p-5 sm:p-8 xl:grid-cols-[18rem_1fr]" onSubmit={submit}>
       <Card>
         <CardHeader>
-          <CardTitle>Perfil y preferencias</CardTitle>
+          <CardTitle>Ajustes</CardTitle>
+          <p className="mt-2 text-sm leading-6 text-budget-muted">Configuracion simple, separada por uso cotidiano.</p>
         </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
-          <Input label="Nombre" value={values.fullName} onChange={(event) => setValues((current) => ({ ...current, fullName: event.target.value }))} required />
-          <Input label="Email" type="email" value={values.email} onChange={(event) => setValues((current) => ({ ...current, email: event.target.value }))} required />
-          <Select label="Moneda principal" value={values.currency} onChange={(event) => setValues((current) => ({ ...current, currency: event.target.value }))}>
-            <option value="ARS">ARS</option>
-            <option value="USD">USD</option>
-            <option value="BRL">BRL</option>
-            <option value="EUR">EUR</option>
-          </Select>
-          <Select label="Modo de alerta" value={values.alertMode} onChange={(event) => setValues((current) => ({ ...current, alertMode: event.target.value }))}>
-            <option value="serio">Serio</option>
-            <option value="normal">Normal</option>
-            <option value="humoristico">Humoristico/directo</option>
-          </Select>
-          <Select label="Perfil de riesgo" value={values.riskProfile} onChange={(event) => setValues((current) => ({ ...current, riskProfile: event.target.value }))}>
-            <option value="conservador">Conservador</option>
-            <option value="moderado">Moderado</option>
-            <option value="agresivo">Agresivo</option>
-          </Select>
-          <Select label="Tema visual" value={values.theme} onChange={(event) => setValues((current) => ({ ...current, theme: event.target.value }))}>
-            <option value="dark">Oscuro</option>
-            <option value="light">Claro futuro</option>
-          </Select>
+        <CardContent className="grid gap-3">
+          {sections.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setSection(item.id)}
+              className={`rounded-lg border px-4 py-3 text-left transition ${
+                section === item.id
+                  ? "border-budget-green bg-budget-soft text-budget-text"
+                  : "border-budget-border bg-budget-surface text-budget-muted hover:bg-budget-hover"
+              }`}
+            >
+              <span className="block text-sm font-semibold">{item.label}</span>
+              <span className="mt-1 block text-xs">{item.helper}</span>
+            </button>
+          ))}
+
+          <div className="rounded-lg border border-budget-border bg-budget-surface p-4">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-sm font-medium text-budget-text">Mercado Pago</span>
+              <Badge tone="warning">Validar en MP</Badge>
+            </div>
+            <p className="mt-2 text-xs leading-5 text-budget-muted">La conexion se gestiona desde su modulo para evitar cambios accidentales.</p>
+          </div>
+
+          <Button type="submit" disabled={mutation.isPending}>
+            <Save className="h-4 w-4" />
+            {mutation.isPending ? "Guardando..." : "Guardar"}
+          </Button>
+          {message ? <p className="text-sm font-medium text-budget-muted">{message}</p> : null}
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Limites financieros</CardTitle>
+          <CardTitle>{sections.find((item) => item.id === section)?.label}</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-4">
-          <Input label="Presupuesto mensual general" type="number" min="0" value={values.monthlyBudget} onChange={(event) => setValues((current) => ({ ...current, monthlyBudget: event.target.value }))} />
-          <Input label="Limite semanal" type="number" min="0" value={values.weeklyBudget} onChange={(event) => setValues((current) => ({ ...current, weeklyBudget: event.target.value }))} />
-          <Input label="Limite de gastos variables" type="number" min="0" value={values.variableBudget} onChange={(event) => setValues((current) => ({ ...current, variableBudget: event.target.value }))} />
-          <Input label="Meta de ahorro mensual" type="number" min="0" value={values.monthlySavingsGoal} onChange={(event) => setValues((current) => ({ ...current, monthlySavingsGoal: event.target.value }))} />
-          <div className="flex items-center justify-between rounded-lg border border-budget-border p-3">
-            <span className="text-sm font-medium text-budget-text">Mercado Pago</span>
-            <Badge tone="warning">Validar en seccion MP</Badge>
-          </div>
-          <Button type="submit" disabled={mutation.isPending}>
-            <Save className="h-4 w-4" />
-            {mutation.isPending ? "Guardando..." : "Guardar ajustes"}
-          </Button>
-          {message ? <p className="text-sm font-medium text-budget-muted">{message}</p> : null}
+        <CardContent className="grid gap-4 md:grid-cols-2">
+          {section === "account" ? (
+            <>
+              <Input label="Nombre visible" value={values.fullName} onChange={(event) => setValues((current) => ({ ...current, fullName: event.target.value }))} required />
+              <Input label="Email de acceso" type="email" value={values.email} onChange={(event) => setValues((current) => ({ ...current, email: event.target.value }))} required />
+              <Select label="Moneda principal" value={values.currency} onChange={(event) => setValues((current) => ({ ...current, currency: event.target.value }))}>
+                <option value="ARS">ARS</option>
+                <option value="USD">USD</option>
+                <option value="BRL">BRL</option>
+                <option value="EUR">EUR</option>
+              </Select>
+            </>
+          ) : null}
+
+          {section === "money" ? (
+            <>
+              <Input label="Presupuesto mensual" type="number" min="0" value={values.monthlyBudget} onChange={(event) => setValues((current) => ({ ...current, monthlyBudget: event.target.value }))} />
+              <Input label="Limite semanal" type="number" min="0" value={values.weeklyBudget} onChange={(event) => setValues((current) => ({ ...current, weeklyBudget: event.target.value }))} />
+              <Input label="Gastos variables" type="number" min="0" value={values.variableBudget} onChange={(event) => setValues((current) => ({ ...current, variableBudget: event.target.value }))} />
+              <Input label="Ahorro mensual" type="number" min="0" value={values.monthlySavingsGoal} onChange={(event) => setValues((current) => ({ ...current, monthlySavingsGoal: event.target.value }))} />
+            </>
+          ) : null}
+
+          {section === "alerts" ? (
+            <>
+              <Select label="Modo de alerta" value={values.alertMode} onChange={(event) => setValues((current) => ({ ...current, alertMode: event.target.value }))}>
+                <option value="serio">Serio</option>
+                <option value="normal">Normal</option>
+                <option value="humoristico">Humoristico/directo</option>
+              </Select>
+              <Select label="Perfil de riesgo" value={values.riskProfile} onChange={(event) => setValues((current) => ({ ...current, riskProfile: event.target.value }))}>
+                <option value="conservador">Conservador</option>
+                <option value="moderado">Moderado</option>
+                <option value="agresivo">Agresivo</option>
+              </Select>
+              <Select label="Tema visual" value={values.theme} onChange={(event) => setValues((current) => ({ ...current, theme: event.target.value }))}>
+                <option value="dark">Oscuro Budgetly</option>
+                <option value="light">Claro futuro</option>
+              </Select>
+            </>
+          ) : null}
         </CardContent>
       </Card>
     </form>

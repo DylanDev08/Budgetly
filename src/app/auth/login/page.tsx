@@ -23,10 +23,10 @@ export default async function LoginPage({
   }
 
   const modules = [
-    { label: "Movimientos", icon: WalletCards, detail: "Ingresos, gastos e imports" },
-    { label: "Presupuestos", icon: Gauge, detail: "Limites por categoria" },
-    { label: "Mercado Pago", icon: CreditCard, detail: "Sync mock y OAuth futuro" },
-    { label: "Asistente", icon: Bot, detail: "Respuestas con datos reales" },
+    { label: "Movimientos", icon: WalletCards, detail: "Carga gastos e ingresos sin perder contexto" },
+    { label: "Presupuestos", icon: Gauge, detail: "Alertas antes de pasarte del limite" },
+    { label: "Mercado Pago", icon: CreditCard, detail: "Importacion y control desde backend" },
+    { label: "Asistente", icon: Bot, detail: "Ayuda simple usando tus datos reales" },
   ];
 
   return (
@@ -41,10 +41,10 @@ export default async function LoginPage({
             </Badge>
             <div className="grid gap-4">
               <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-normal text-budget-text sm:text-5xl">
-                Tu control financiero diario, ordenado por modulos.
+                Tu dinero diario, entendido en un panel simple.
               </h1>
               <p className="max-w-2xl text-base leading-7 text-budget-muted">
-                Budgetly organiza gastos, presupuestos, metas, comprobantes y asistencia en una arquitectura lista para escalar.
+                Budgetly convierte movimientos, presupuestos, metas y obligaciones en decisiones claras: que pagar, cuanto gastar y cuando frenar.
               </p>
             </div>
           </div>
@@ -70,7 +70,7 @@ export default async function LoginPage({
           </div>
 
           <div className="flex flex-wrap gap-3 text-sm text-budget-muted">
-            {["Categorias y subcategorias", "Admin con auditoria", "RLS por usuario", "Sin exponer secretos"].map((item) => (
+            {["Gastos por categoria", "Metas y obligaciones", "Admin con auditoria", "RLS por usuario"].map((item) => (
               <span key={item} className="inline-flex items-center gap-2 rounded-full border border-budget-border bg-budget-surface px-3 py-2">
                 <ArrowRight className="h-3.5 w-3.5 text-budget-neon" />
                 {item}

@@ -17,7 +17,7 @@ export async function GET() {
   weekStart.setDate(now.getDate() - now.getDay());
   weekStart.setHours(0, 0, 0, 0);
 
-  const [profile, transactions, budgets, obligations, goals, invoices, mercadoPago] = await Promise.all([
+  const [profile, transactions, budgets, obligations, pendingObligationCount, goals, invoices, mercadoPago, pendingUploads, pendingExtractions] = await Promise.all([
     prisma.profile.findUnique({ where: { userId: auth.user.id } }),
     prisma.transaction.findMany({
       where: { userId: auth.user.id, date: { gte: monthStart } },
@@ -26,9 +26,12 @@ export async function GET() {
     }),
     prisma.budget.findMany({ where: { userId: auth.user.id } }),
     prisma.obligation.findMany({ where: { userId: auth.user.id, status: "pendiente" }, orderBy: { dueDay: "asc" }, take: 5 }),
+    prisma.obligation.count({ where: { userId: auth.user.id, status: "pendiente" } }),
     prisma.goal.findMany({ where: { userId: auth.user.id, status: "activa" }, take: 5 }),
     prisma.invoice.findMany({ where: { userId: auth.user.id }, orderBy: { date: "desc" }, take: 5 }),
     prisma.mercadoPagoAccount.findUnique({ where: { userId: auth.user.id } }),
+    prisma.uploadedAsset.count({ where: { userId: auth.user.id, status: { in: ["uploaded", "storage_pending"] } } }).catch(() => 0),
+    prisma.extractedFinancialData.count({ where: { userId: auth.user.id, status: "pending" } }).catch(() => 0),
   ]);
 
   const income = transactions.filter((item) => item.kind === "income").reduce((acc, item) => acc + Number(item.amount.toString()), 0);
@@ -37,6 +40,8 @@ export async function GET() {
     .filter((item) => item.kind === "expense" && item.date >= weekStart)
     .reduce((acc, item) => acc + Number(item.amount.toString()), 0);
   const monthlyBudget = Number(profile?.monthlyBudget?.toString() ?? budgets.find((item) => item.type === "mensual")?.limitAmount.toString() ?? 0);
+  const weeklyBudget = Number(profile?.weeklyBudget?.toString() ?? budgets.find((item) => item.type === "semanal")?.limitAmount.toString() ?? 0);
+  const monthlySavingsGoal = Number(profile?.monthlySavingsGoal?.toString() ?? 0);
   const budgetUsed = monthlyBudget > 0 ? Math.round((expense / monthlyBudget) * 100) : 0;
   const categories = new Map<string, number>();
 
@@ -52,9 +57,9 @@ export async function GET() {
     expenses: expense,
     weeklyExpense,
     monthlyBudget,
-    weeklyBudget: Number(profile?.weeklyBudget?.toString() ?? 0),
-    monthlySavingsGoal: Number(profile?.monthlySavingsGoal?.toString() ?? 0),
-    pendingObligations: obligations.length,
+    weeklyBudget,
+    monthlySavingsGoal,
+    pendingObligations: pendingObligationCount,
     activeGoals: goals.map((goal) => ({
       targetAmount: Number(goal.targetAmount.toString()),
       currentAmount: Number(goal.currentAmount.toString()),
@@ -64,14 +69,17 @@ export async function GET() {
     income,
     expenses: expense,
     budgetUsed,
-    pendingObligations: obligations.length,
+    pendingObligations: pendingObligationCount,
     activeGoals: goals.length,
     mercadoPagoConnected: Boolean(mercadoPago),
     plan: profile?.plan ?? "free",
+    pendingUploads,
+    pendingExtractions,
   });
 
   return NextResponse.json({
     currency: profile?.currency ?? "ARS",
+    plan: profile?.plan ?? "free",
     income,
     expense,
     balance: income - expense,
@@ -80,7 +88,6 @@ export async function GET() {
     health: budgetUsed >= 120 ? "critico" : budgetUsed >= 80 ? "advertencia" : "bien",
     pulse,
     nextBestAction,
-    plan: profile?.plan ?? "free",
     topCategory: topCategory ? { name: topCategory[0], amount: topCategory[1] } : null,
     recentTransactions: transactions.slice(0, 5).map((item) => ({
       id: item.id,

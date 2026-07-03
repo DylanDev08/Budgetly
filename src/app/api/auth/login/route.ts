@@ -60,12 +60,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: getSafeSignInError(error.message) }, { status: error.status ?? 401 });
   }
 
+  let redirectTo = "/dashboard";
+
   if (data.user) {
     const profile = await ensureUserProfile({
       userId: data.user.id,
       fullName: data.user.user_metadata.full_name ?? data.user.email ?? "Usuario Budgetly",
       email: data.user.email ?? parsed.data.email,
     });
+    redirectTo = profile.role === "admin" ? "/admin" : "/dashboard";
 
     await createAuditLog({
       userId: data.user.id,
@@ -76,5 +79,5 @@ export async function POST(request: Request) {
     });
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, redirectTo });
 }
